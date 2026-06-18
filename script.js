@@ -493,9 +493,12 @@ if (urlPlayBtn) {
   urlPlayBtn.addEventListener("click", () => {
     const urlInput = document.getElementById("song-url-input").value.trim();
     if (urlInput) {
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('link', urlInput);
-      window.location.href = newUrl.href;
+      urlPlayBtn.classList.add("active-led");
+      setTimeout(() => {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('link', urlInput);
+        window.location.href = newUrl.href;
+      }, 2000);
     }
   });
   

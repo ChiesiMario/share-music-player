@@ -10,12 +10,14 @@
   box-sizing: border-box;
 }
 
-body, html {
+body,
+html {
   width: 100%;
   height: 100%;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   overflow: hidden;
-  background: #c2c3c4; /* Clean light gray surface */
+  background: #c2c3c4;
+  /* Clean light gray surface */
 }
 
 /* Wrapper to hold everything */
@@ -39,14 +41,18 @@ body, html {
   width: 90%;
   max-width: 400px;
   margin: auto;
-  background: #aab0b5; /* Matte medium gray */
-  border-radius: 8px; /* sharper corners for synth look */
+  background: #aab0b5;
+  /* Matte medium gray */
+  border-radius: 8px;
+  /* sharper corners for synth look */
   padding: 24px;
   border: 1px solid #8c9094;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.2), /* Softer global shadow */
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.2),
+    /* Softer global shadow */
     0 10px 15px rgba(0, 0, 0, 0.1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8), /* subtle top edge highlight */
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    /* subtle top edge highlight */
     inset 0 -1px 2px rgba(0, 0, 0, 0.1);
   position: relative;
 }
@@ -67,14 +73,24 @@ body, html {
 
 /* Artwork - The Recessed Tray (Only active when cover is loaded) */
 .artwork-container.has-cover {
-  background: #aab0b5; /* Matches chassis */
+  background: #aab0b5;
+  aspect-ratio: auto; /* Remove fixed square ratio */
+  width: auto; /* Allow shrink-wrapping */
+  max-width: 65%;
+  align-self: center; /* Center the shrink-wrapped container */
+  /* Matches chassis */
   /* Carved-out tray effect */
-  box-shadow: 
-    inset 0 4px 10px rgba(0,0,0,0.3), /* Deep inner shadow at top */
-    inset 0 1px 3px rgba(0,0,0,0.2), /* Sharp inner rim */
-    inset 0 -2px 3px rgba(255,255,255,0.7), /* Inner highlight at bottom */
-    0 1px 1px rgba(255,255,255,0.8); /* Outer chassis lip highlight */
-  padding: 8px; /* Width of the recess */
+  box-shadow:
+    inset 0 4px 10px rgba(0, 0, 0, 0.3),
+    /* Deep inner shadow at top */
+    inset 0 1px 3px rgba(0, 0, 0, 0.2),
+    /* Sharp inner rim */
+    inset 0 -2px 3px rgba(255, 255, 255, 0.7),
+    /* Inner highlight at bottom */
+    0 1px 1px rgba(255, 255, 255, 0.8);
+  /* Outer chassis lip highlight */
+  padding: 8px;
+  /* Width of the recess */
 }
 
 .default-cover {
@@ -103,20 +119,42 @@ body, html {
 
 .eq-bars .bar {
   width: 6px;
-  background: #00ffd5; /* Glowing cyan LED */
-  border-radius: 2px; /* Sharper synth look */
-  box-shadow: 0 0 8px rgba(0, 255, 213, 0.6), inset 0 1px 2px rgba(255,255,255,0.8);
+  background: #00ffd5;
+  /* Glowing cyan LED */
+  border-radius: 2px;
+  /* Sharper synth look */
+  box-shadow: 0 0 8px rgba(0, 255, 213, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.8);
   animation: eq-bounce 1s infinite ease-in-out alternate;
 }
 
-.eq-bars .bar:nth-child(1) { height: 15px; animation-delay: 0.1s; }
-.eq-bars .bar:nth-child(2) { height: 35px; animation-delay: 0.3s; }
-.eq-bars .bar:nth-child(3) { height: 25px; animation-delay: 0.2s; }
-.eq-bars .bar:nth-child(4) { height: 10px; animation-delay: 0.4s; }
+.eq-bars .bar:nth-child(1) {
+  height: 15px;
+  animation-delay: 0.1s;
+}
+
+.eq-bars .bar:nth-child(2) {
+  height: 35px;
+  animation-delay: 0.3s;
+}
+
+.eq-bars .bar:nth-child(3) {
+  height: 25px;
+  animation-delay: 0.2s;
+}
+
+.eq-bars .bar:nth-child(4) {
+  height: 10px;
+  animation-delay: 0.4s;
+}
 
 @keyframes eq-bounce {
-  0% { transform: scaleY(0.8); }
-  100% { transform: scaleY(1.2); }
+  0% {
+    transform: scaleY(0.8);
+  }
+
+  100% {
+    transform: scaleY(1.2);
+  }
 }
 
 .share-text-modern {
@@ -129,32 +167,43 @@ body, html {
 .share-label {
   font-size: 13px;
   font-weight: 700;
-  color: #333; /* Sharp silkscreen printed text */
+  color: #333;
+  /* Sharp silkscreen printed text */
   letter-spacing: 6px;
-  margin-left: 6px; /* Offset to center text with letter-spacing */
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); /* Subtle paint thickness */
+  margin-left: 6px;
+  /* Offset to center text with letter-spacing */
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* Subtle paint thickness */
 }
 
 .share-highlight {
   font-size: 26px;
   font-weight: 900;
-  color: #2b2b2b; /* Sharp silkscreen printed text */
+  color: #2b2b2b;
+  /* Sharp silkscreen printed text */
   letter-spacing: 2px;
   text-transform: uppercase;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); /* Subtle paint thickness */
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* Subtle paint thickness */
 }
 
 /* The Album Art Tile sitting inside the tray */
 .artwork-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 6px; /* Inner corner sharpness */
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 45vh; /* Responsive height limit */
+  object-fit: contain; /* Ensures original proportions */
+  border-radius: 6px;
+  /* Inner corner sharpness */
   /* Floating inside the recess */
-  box-shadow: 
-    0 3px 6px rgba(0,0,0,0.25), /* Drop shadow inside the tray */
-    0 0 0 1px rgba(0,0,0,0.05), /* Micro border for physical edge */
-    inset 0 1px 1px rgba(255,255,255,0.3); /* Subtle glossy surface highlight */
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.25),
+    /* Drop shadow inside the tray */
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    /* Micro border for physical edge */
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  /* Subtle glossy surface highlight */
   display: block;
 }
 
@@ -189,12 +238,12 @@ body, html {
   cursor: pointer;
   transition: all 0.1s ease;
   font-size: 16px;
-  box-shadow: 
-    0 4px 5px rgba(0,0,0,0.2), 
-    inset 0 1px 2px rgba(255,255,255,0.8),
-    inset 0 -2px 3px rgba(0,0,0,0.1);
+  box-shadow:
+    0 4px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.1);
   position: relative;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .nav-btn:hover {
@@ -205,9 +254,9 @@ body, html {
 .nav-btn:active {
   transform: translateY(2px);
   background: radial-gradient(circle at 50% 10%, #a6a6a6 0%, #b8b8b8 50%, #d5d5d5 100%);
-  box-shadow: 
-    0 1px 2px rgba(0,0,0,0.1), 
-    inset 0 3px 6px rgba(0,0,0,0.4);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 3px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* Track Info (LCD Screen) */
@@ -223,30 +272,45 @@ body, html {
   position: relative;
   z-index: 1;
   border-radius: 12px;
-  background: #aab0b5; /* Matches chassis */
+  background: #aab0b5;
+  /* Matches chassis */
   /* Carved-out tray effect */
-  box-shadow: 
-    inset 0 4px 10px rgba(0,0,0,0.3), /* Deep inner shadow at top */
-    inset 0 1px 3px rgba(0,0,0,0.2), /* Sharp inner rim */
-    inset 0 -2px 3px rgba(255,255,255,0.7), /* Inner highlight at bottom */
-    0 1px 1px rgba(255,255,255,0.8); /* Outer chassis lip highlight */
-  padding: 18px 12px; /* Pad inside the screen area (6px + 12px = 18px) */
+  box-shadow:
+    inset 0 4px 10px rgba(0, 0, 0, 0.3),
+    /* Deep inner shadow at top */
+    inset 0 1px 3px rgba(0, 0, 0, 0.2),
+    /* Sharp inner rim */
+    inset 0 -2px 3px rgba(255, 255, 255, 0.7),
+    /* Inner highlight at bottom */
+    0 1px 1px rgba(255, 255, 255, 0.8);
+  /* Outer chassis lip highlight */
+  padding: 18px 12px;
+  /* Pad inside the screen area (6px + 12px = 18px) */
 }
 
 /* The actual LCD screen sitting inside the tray */
 .track-info::before {
   content: '';
   position: absolute;
-  top: 6px; left: 6px; right: 6px; bottom: 6px;
-  background: #0f1614; /* Dark LCD background */
-  border-radius: 6px; /* Inner corner sharpness */
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  background: #0f1614;
+  /* Dark LCD background */
+  border-radius: 6px;
+  /* Inner corner sharpness */
   z-index: -1;
   /* Floating inside the recess */
-  box-shadow: 
-    0 3px 6px rgba(0,0,0,0.25), /* Drop shadow inside the tray */
-    0 0 0 1px rgba(0,0,0,0.5), /* Micro border for physical edge */
-    inset 0 1px 1px rgba(255,255,255,0.1), /* Subtle glossy surface highlight */
-    inset 0 4px 10px rgba(0,0,0,0.8); /* Inner depth of the screen */
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.25),
+    /* Drop shadow inside the tray */
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    /* Micro border for physical edge */
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    /* Subtle glossy surface highlight */
+    inset 0 4px 10px rgba(0, 0, 0, 0.8);
+  /* Inner depth of the screen */
 }
 
 .track-info h1 {
@@ -268,7 +332,9 @@ body, html {
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 .fetch-progress {
@@ -280,16 +346,16 @@ body, html {
   margin-bottom: 8px;
   overflow: hidden;
   display: none;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 #fetch-progress-bar {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(255,255,255,0.7), #fff);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.7), #fff);
   border-radius: 6px;
   transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
   position: relative;
 }
 
@@ -352,8 +418,15 @@ body, html {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .input-wrapper {
@@ -366,7 +439,8 @@ body, html {
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #54c8fa; /* Cyan glow */
+  color: #54c8fa;
+  /* Cyan glow */
   font-size: 14px;
   text-shadow: 0 0 5px rgba(84, 200, 250, 0.5);
 }
@@ -375,28 +449,35 @@ body, html {
   width: 100%;
   padding: 14px 16px 14px 40px;
   border-radius: 4px;
-  border: 1px solid #333; /* Darker border, blending with screen */
-  background: rgba(0, 0, 0, 0.3); /* slightly darker than the screen */
-  color: #54c8fa; /* Glowing cyan text */
-  font-family: "Courier New", Courier, monospace; /* Match the title font */
+  border: 1px solid rgba(84, 200, 250, 0.4);
+  /* Cyan wireframe border */
+  background: rgba(84, 200, 250, 0.05);
+  /* slight cyan tint */
+  color: #54c8fa;
+  /* Glowing cyan text */
+  font-family: "Courier New", Courier, monospace;
+  /* Match the title font */
   font-size: 14px;
   outline: none;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
-  text-shadow: 0 0 5px rgba(84, 200, 250, 0.5);
+  box-shadow: 
+    0 0 8px rgba(84, 200, 250, 0.1), 
+    inset 0 0 8px rgba(84, 200, 250, 0.1);
+  text-shadow: 0 0 8px rgba(84, 200, 250, 0.6);
   transition: all 0.2s ease;
 }
 
 .url-input::placeholder {
-  color: rgba(84, 200, 250, 0.3); /* Dimmed cyan placeholder */
+  color: rgba(84, 200, 250, 0.4);
+  /* Dimmed cyan placeholder */
   text-shadow: none;
 }
 
 .url-input:focus {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(84, 200, 250, 0.1);
   border-color: #54c8fa;
-  box-shadow: 
-    inset 0 2px 5px rgba(0, 0, 0, 0.5), 
-    0 0 8px rgba(84,200,250,0.4);
+  box-shadow:
+    0 0 12px rgba(84, 200, 250, 0.3),
+    inset 0 0 12px rgba(84, 200, 250, 0.2);
 }
 
 .input-wrapper:focus-within .input-icon {
@@ -406,7 +487,7 @@ body, html {
 
 #url-play-btn-wrapper {
   width: 100%;
-  margin: -5px 0 15px 0;
+  margin: 50px 0 10px 0;
   display: flex;
   justify-content: center;
 }
@@ -415,18 +496,20 @@ body, html {
   width: 100%;
   padding: 14px;
   border-radius: 8px;
-  border: 1px solid #1a1a1a;
-  background: radial-gradient(circle at 50% 10%, #ff5e5e 0%, #e62e2e 50%, #b31010 100%);
-  color: #fff;
+  background: radial-gradient(circle at 50% 10%, #d5d5d5 0%, #b8b8b8 50%, #999 100%);
+  color: #555;
+  border: 1px solid #777;
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
-  box-shadow: 
-    0 6px 12px rgba(0,0,0,0.3), 
-    inset 0 1px 2px rgba(255,255,255,0.6),
-    inset 0 -2px 4px rgba(0,0,0,0.3);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+  position: relative;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -434,16 +517,44 @@ body, html {
   transition: transform 0.1s, box-shadow 0.1s;
 }
 
+.url-play-btn-physical span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Integrated LED Indicator */
+.url-play-btn-physical::before {
+  content: '';
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6a0000;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(255, 255, 255, 0.7);
+  display: block;
+  transition: all 2s ease;
+}
+
+.url-play-btn-physical.active-led::before {
+  background: #00ff44;
+  box-shadow: 0 0 10px rgba(0, 255, 68, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
 .url-play-btn-physical:hover {
-  background: radial-gradient(circle at 50% 10%, #ff8080 0%, #f04040 50%, #cc1b1b 100%);
+  background: radial-gradient(circle at 50% 10%, #e0e0e0 0%, #c4c4c4 50%, #a6a6a6 100%);
+  color: #333;
 }
 
 .url-play-btn-physical:active {
   transform: translateY(3px);
-  background: radial-gradient(circle at 50% 10%, #cc1b1b 0%, #e62e2e 50%, #ff5e5e 100%);
-  box-shadow: 
-    0 2px 4px rgba(0,0,0,0.3), 
-    inset 0 4px 8px rgba(0,0,0,0.6);
+  background: radial-gradient(circle at 50% 10%, #a6a6a6 0%, #b8b8b8 50%, #d5d5d5 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Progress Area */
@@ -461,7 +572,7 @@ body, html {
   cursor: pointer;
   position: relative;
   margin-bottom: 8px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.4);
   border: 1px solid #333;
   border-bottom: none;
 }
@@ -473,7 +584,7 @@ body, html {
   width: 0%;
   transition: width 0.1s linear;
   position: relative;
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 /* Progress Thumb */
@@ -488,9 +599,10 @@ body, html {
   background: radial-gradient(circle at 30% 30%, #fff 0%, #a0a0a0 70%, #666 100%);
   border: 1px solid #555;
   border-radius: 50%;
-  opacity: 1; /* Always show in skeuomorphic */
+  opacity: 1;
+  /* Always show in skeuomorphic */
   transition: transform 0.1s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.8), inset 0 -2px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 -2px 2px rgba(0, 0, 0, 0.3);
 }
 
 .progress-bar-bg:hover .progress-fill::after {
@@ -511,7 +623,8 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 30px auto 30px auto; /* Margin to prevent shadow clipping */
+  margin: 30px auto 30px auto;
+  /* Margin to prevent shadow clipping */
   position: relative;
   width: max-content;
 }
@@ -526,16 +639,17 @@ body, html {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #444; /* default off */
-  box-shadow: 
-    inset 0 2px 3px rgba(0,0,0,0.8), 
-    0 1px 1px rgba(255,255,255,0.7);
+  background: #444;
+  /* default off */
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.8),
+    0 1px 1px rgba(255, 255, 255, 0.7);
   transition: all 0.2s ease;
 }
 
 .controls.playing::before {
   background: #00ffd5;
-  box-shadow: 0 0 10px rgba(0, 255, 213, 0.8), inset 0 1px 2px rgba(255,255,255,0.8);
+  box-shadow: 0 0 10px rgba(0, 255, 213, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .controls i {
@@ -548,13 +662,14 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 
-    0 6px 12px rgba(0,0,0,0.2), 
-    inset 0 1px 2px rgba(255,255,255,0.8),
-    inset 0 -2px 3px rgba(0,0,0,0.1);
-  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
   font-size: 28px;
-  padding-left: 4px; /* visually center play icon */
+  padding-left: 4px;
+  /* visually center play icon */
   cursor: pointer;
   transition: all 0.1s ease;
 }
@@ -567,13 +682,14 @@ body, html {
 .controls i:active {
   transform: translateY(2px);
   background: radial-gradient(circle at 50% 10%, #a6a6a6 0%, #b8b8b8 50%, #d5d5d5 100%);
-  box-shadow: 
-    0 2px 4px rgba(0,0,0,0.2), 
-    inset 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .controls i.fa-pause {
-  padding-left: 0; /* Reset for pause icon */
+  padding-left: 0;
+  /* Reset for pause icon */
 }
 
 /* Mobile Adjustments */
@@ -588,6 +704,7 @@ body, html {
     padding: 24px 20px;
     border-radius: 28px;
   }
+
   .artwork-container {
     width: 85%;
   }
@@ -612,12 +729,12 @@ body, html {
   font-weight: 600;
   border: 1px solid #111;
   border-top-color: #555;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   opacity: 0;
   visibility: hidden;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 9999;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   pointer-events: none;
 }
 
@@ -625,4 +742,44 @@ body, html {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+}
+
+/* Responsive Scaling for Short Screens */
+@media (max-height: 850px) {
+  .player-wrapper {
+    padding: max(2vh, 10px) 0;
+  }
+  .player-card {
+    padding: min(3vh, 24px) min(4vw, 24px);
+  }
+  .artwork-container {
+    width: min(65%, 45vh);
+    margin: 0 auto min(2.5vh, 20px) auto;
+  }
+  .top-nav {
+    margin-bottom: min(2vh, 15px);
+  }
+  .track-info {
+    margin-bottom: min(2vh, 15px);
+    padding: min(2.5vh, 18px) 12px;
+  }
+  #url-play-btn-wrapper {
+    margin: 50px 0 min(2vh, 15px) 0;
+  }
+}
+
+@media (max-height: 650px) {
+  .artwork-container {
+    width: min(55%, 35vh);
+  }
+  .player-card {
+    padding: 12px 16px;
+  }
+  .track-info h1 {
+    font-size: 16px;
+  }
+  .url-play-btn-physical {
+    padding: 10px;
+    font-size: 14px;
+  }
 }
