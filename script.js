@@ -18,9 +18,7 @@ const progress = document.getElementById("progress");
 const currentTimeEle = document.getElementById("current-time");
 const durationEle = document.getElementById("duration");
 
-const prevBtn = document.getElementById("prev");
 const playBtn = document.getElementById("play");
-const nextBtn = document.getElementById("next");
 
 
 var getUrlString = location.href;
@@ -66,6 +64,7 @@ function playSong() {
   isPlaying = true;
   playBtn.classList.replace("fa-play", "fa-pause");
   playBtn.setAttribute("title", "Pause");
+  controls.classList.add("playing");
   music.play();
 }
 
@@ -73,6 +72,7 @@ function pauseSong() {
   isPlaying = false;
   playBtn.classList.replace("fa-pause", "fa-play");
   playBtn.setAttribute("title", "Play");
+  controls.classList.remove("playing");
   music.pause();
 }
 
@@ -116,6 +116,7 @@ function loadSong(song) {
     image.src = `${song.cover}`;
     image.style.display = 'block';
     document.getElementById('default-cover').style.display = 'none';
+    document.querySelector('.artwork-container').classList.add('has-cover');
     if (background) background.style.backgroundImage = `url(${song.cover})`;
   } else {
     artistLink.style.pointerEvents = 'none';
@@ -126,6 +127,7 @@ function loadSong(song) {
   if (!(song.cover && song.cover !== './img/logo.png')) {
     image.style.display = 'none';
     defaultCover.style.display = 'flex';
+    document.querySelector('.artwork-container').classList.remove('has-cover');
     if (background) background.style.backgroundImage = 'none';
   }
 
@@ -380,6 +382,10 @@ if (songs[0].mp3link) {
     if (inputContainer) {
       inputContainer.style.display = "flex";
     }
+    const playBtnWrapper = document.getElementById("url-play-btn-wrapper");
+    if (playBtnWrapper) {
+      playBtnWrapper.style.display = "flex";
+    }
   }
 }
 
@@ -477,8 +483,6 @@ document.addEventListener("mouseup", stopDragging);
 document.addEventListener("touchend", stopDragging);
 
 // event listeners for buttons
-prevBtn.addEventListener("click", prevSong);
-nextBtn.addEventListener("click", nextSong);
 
 music.addEventListener("timeupdate", updateProgressBar);
 music.addEventListener("ended", nextSong);

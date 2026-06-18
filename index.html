@@ -64,13 +64,16 @@
               <i class="fa-solid fa-link input-icon"></i>
               <input type="text" id="song-url-input" class="url-input" placeholder="輸入 MP3 網址 (https://...)">
             </div>
-            <button id="song-url-play-btn" class="url-play-btn">
-              <i class="fa-solid fa-play"></i> 播 放
-            </button>
           </div>
           <h2 id="artist"><a id="artist-link" href="#" target="_blank">&nbsp;</a></h2>
           <h3 id="album"><a id="album-link" href="#" target="_blank">&nbsp;</a></h3>
           <h4 id="year">&nbsp;</h4>
+        </div>
+
+        <div id="url-play-btn-wrapper" style="display: none;">
+          <button id="song-url-play-btn" class="url-play-btn-physical">
+            <i class="fa-solid fa-play"></i> 播 放
+          </button>
         </div>
         
         <div id="bottom-section" style="display: grid; grid-template-rows: 0fr; opacity: 0; pointer-events: none; transition: grid-template-rows 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease; width: 100%;">
