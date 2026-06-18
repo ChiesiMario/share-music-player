@@ -20,6 +20,80 @@ const durationEle = document.getElementById("duration");
 
 const playBtn = document.getElementById("play");
 
+  // Audio Analyzer setup
+let audioCtx;
+let analyserNode;
+let mediaSourceNode;
+let visualizerDataArray;
+let isAnalyzerSetup = false;
+let animationFrameId;
+
+function setupAudioAnalyzer() {
+  if (isAnalyzerSetup) return;
+  
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  try {
+    mediaSourceNode = audioCtx.createMediaElementSource(music);
+    analyserNode = audioCtx.createAnalyser();
+    analyserNode.fftSize = 128; // 64 frequency bins
+    
+    mediaSourceNode.connect(analyserNode);
+    analyserNode.connect(audioCtx.destination);
+    
+    const bufferLength = analyserNode.frequencyBinCount;
+    visualizerDataArray = new Uint8Array(bufferLength);
+    
+    isAnalyzerSetup = true;
+  } catch (err) {
+    console.warn("Could not setup audio analyzer:", err);
+  }
+}
+
+// Visualizer is now hardcoded in HTML, so we don't need to generate it.
+
+function updateVisualizer() {
+  if (!isPlaying) return;
+  
+  const bars = document.querySelectorAll(".lcd-bar");
+  if (bars.length > 0) {
+    let useFake = true;
+    
+    if (isAnalyzerSetup && analyserNode) {
+      analyserNode.getByteFrequencyData(visualizerDataArray);
+      let sum = 0;
+      for (let i = 0; i < visualizerDataArray.length; i++) {
+        sum += visualizerDataArray[i];
+      }
+      if (sum > 0) useFake = false;
+    }
+    
+    bars.forEach((bar, index) => {
+      let val = 0;
+      if (useFake) {
+        // Fake frequency bounce if CORS blocks Web Audio API
+        val = Math.random() * 200 + 20; // Random value between 20 and 220
+      } else {
+        // Use bins 0 to 31 (skip higher frequencies for better visuals)
+        val = visualizerDataArray[index] || 0;
+      }
+      // Normalize 0-255 to 0.05-1.0
+      const scale = Math.max(0.05, val / 255);
+      bar.style.transform = `scaleY(${scale})`;
+    });
+  }
+  
+  // Throttle animation to make it look like a chunky LCD screen update (~15fps)
+  setTimeout(() => {
+    animationFrameId = requestAnimationFrame(updateVisualizer);
+  }, 60);
+}
+
 
 var getUrlString = location.href;
 var url = new URL(getUrlString);
@@ -70,7 +144,15 @@ function playSong() {
   
   clearTimeout(playTimeout);
   playTimeout = setTimeout(() => {
-    if (isPlaying) music.play();
+    if (isPlaying) {
+      music.play().then(() => {
+        setupAudioAnalyzer();
+        cancelAnimationFrame(animationFrameId);
+        updateVisualizer();
+      }).catch(e => console.error("Playback failed:", e));
+      const lcdEq = document.getElementById("lcd-eq");
+      if (lcdEq) lcdEq.classList.add("playing");
+    }
   }, 1000);
 }
 
@@ -79,6 +161,10 @@ function pauseSong() {
   playBtn.classList.replace("fa-pause", "fa-play");
   playBtn.setAttribute("title", "Play");
   controls.classList.remove("playing");
+  
+  const lcdEq = document.getElementById("lcd-eq");
+  if (lcdEq) lcdEq.classList.remove("playing");
+  cancelAnimationFrame(animationFrameId);
   
   clearTimeout(playTimeout);
   music.pause();
@@ -601,12 +687,10 @@ if (homeBtn) {
 }
 
 // --- Physical Button Click Sound Synthesis ---
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
 
 function playClickSound() {
   if (!audioCtx) {
-    audioCtx = new AudioContext();
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();

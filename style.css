@@ -313,6 +313,48 @@ html {
   /* Inner depth of the screen */
 }
 
+/* Ensure text sits above the visualizer background */
+.track-info > h1,
+.track-info > h2,
+.track-info > h3,
+.track-info > h4,
+.track-info > div:not(.lcd-eq):not(.track-info::before) {
+  position: relative;
+  z-index: 2;
+}
+
+/* LCD EQ Visualizer (Background Mode) */
+.lcd-eq {
+  position: absolute;
+  inset: 0; /* Cover the entire track-info */
+  padding: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch; /* FIX: Force bars to fill height */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1; /* Ensure it is above the background */
+  border-radius: 6px;
+  overflow: hidden;
+  pointer-events: none; /* Let clicks pass through to text just in case */
+}
+
+.lcd-eq.playing {
+  opacity: 1;
+}
+
+.lcd-bar {
+  flex: 1;
+  min-width: 2px;
+  margin: 0 1px;
+  background: rgba(0, 255, 68, 0.25); /* Balanced Neon Green */
+  box-shadow: 0 0 8px rgba(0, 255, 68, 0.4);
+  transform-origin: bottom;
+  border-radius: 1px 1px 0 0;
+  transform: scaleY(0.01); /* Default hidden state */
+  transition: transform 0.05s ease-out;
+}
+
 .track-info h1 {
   color: #54c8fa;
   font-family: "DotGothic16", "Courier New", Courier, monospace;
@@ -322,7 +364,7 @@ html {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 0 5px rgba(84, 200, 250, 0.5);
+  text-shadow: 0 0 8px rgba(84, 200, 250, 0.8), 0 0 2px rgba(255, 255, 255, 0.3); /* Stronger glow to cut through green bars */
   text-transform: uppercase;
 }
 

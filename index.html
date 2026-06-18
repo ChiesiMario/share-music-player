@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css?v=3" />
+    <link rel="stylesheet" href="./style.css?v=13" />
   </head>
   <body>
     <div class="player-wrapper">
@@ -26,7 +26,7 @@
       <div class="player-card">
         
         <div class="top-nav" id="top-nav">
-          <button id="home-btn" class="nav-btn" title="回首頁 (輸入新網址)">
+          <button id="home-btn" class="nav-btn" title="回首頁 (輸入新的網址)">
             <i class="fa-solid fa-house"></i>
           </button>
           <button id="share-btn" class="nav-btn" title="複製連結分享">
@@ -54,6 +54,40 @@
         </div>
         
         <div class="track-info">
+          <div class="lcd-eq" id="lcd-eq">
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+<div class="lcd-bar"></div>
+</div>
           <h1 id="title">&nbsp;</h1>
           <div id="fetch-progress-container" class="fetch-progress">
             <div id="fetch-progress-bar"></div>
@@ -72,7 +106,7 @@
 
         <div id="url-play-btn-wrapper" style="display: none;">
           <button id="song-url-play-btn" class="url-play-btn-physical">
-            <span><i class="fa-solid fa-play"></i> 播 放</span>
+            <span><i class="fa-solid fa-play"></i> 播放</span>
           </button>
         </div>
         
@@ -94,13 +128,13 @@
           </div>
         </div>
         
-        <audio id="audio" src=""></audio>
+        <audio id="audio" crossorigin="anonymous" src=""></audio>
       </div>
     </div>
     
     <div id="toast">已複製音樂連結！</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
-    <script src="./script.js"></script>
+    <script src="./script.js?v=9"></script>
   </body>
 </html>
