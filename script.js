@@ -60,12 +60,18 @@ function nextSong() {
   if (isPlaying) playSong();
 }
 
+let playTimeout;
+
 function playSong() {
   isPlaying = true;
   playBtn.classList.replace("fa-play", "fa-pause");
   playBtn.setAttribute("title", "Pause");
   controls.classList.add("playing");
-  music.play();
+  
+  clearTimeout(playTimeout);
+  playTimeout = setTimeout(() => {
+    if (isPlaying) music.play();
+  }, 1000);
 }
 
 function pauseSong() {
@@ -73,6 +79,8 @@ function pauseSong() {
   playBtn.classList.replace("fa-pause", "fa-play");
   playBtn.setAttribute("title", "Play");
   controls.classList.remove("playing");
+  
+  clearTimeout(playTimeout);
   music.pause();
 }
 
@@ -567,3 +575,70 @@ if (homeBtn) {
     window.location.href = window.location.pathname;
   });
 }
+
+// --- Physical Button Click Sound Synthesis ---
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function playClickSound() {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  const t = audioCtx.currentTime;
+  
+  // 1. High frequency noise burst for the mechanical "click" contact
+  const bufferSize = audioCtx.sampleRate * 0.02; // 20ms of noise
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  
+  const noiseSource = audioCtx.createBufferSource();
+  noiseSource.buffer = buffer;
+  
+  const noiseFilter = audioCtx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 5000;
+  noiseFilter.Q.value = 1;
+  
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(1.5, t);
+  noiseGain.gain.setTargetAtTime(0, t, 0.005); // extremely rapid decay
+  
+  noiseSource.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(audioCtx.destination);
+  noiseSource.start(t);
+  
+  // 2. Low frequency thud for the plastic/metal body resonance
+  const osc = audioCtx.createOscillator();
+  const oscGain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(80, t); // constant low pitch
+  
+  oscGain.gain.setValueAtTime(0.4, t);
+  oscGain.gain.setTargetAtTime(0, t, 0.01); // fast decay
+  
+  const oscFilter = audioCtx.createBiquadFilter();
+  oscFilter.type = 'lowpass';
+  oscFilter.frequency.value = 600;
+  
+  osc.connect(oscFilter);
+  oscFilter.connect(oscGain);
+  oscGain.connect(audioCtx.destination);
+  osc.start(t);
+  osc.stop(t + 0.05);
+}
+
+// Attach physical sound to all buttons
+document.addEventListener('mousedown', (e) => {
+  const btn = e.target.closest('button, .nav-btn, .url-play-btn-physical, .btn-play');
+  if (btn && !btn.disabled && !btn.classList.contains('active-led')) {
+    playClickSound();
+  }
+});
