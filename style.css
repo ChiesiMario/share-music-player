@@ -540,6 +540,7 @@ html {
 .url-play-btn-physical.active-led::before {
   background: #00ff44;
   box-shadow: 0 0 10px rgba(0, 255, 68, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 1.5s ease;
 }
 
 .url-play-btn-physical:hover {
@@ -547,7 +548,8 @@ html {
   color: #333;
 }
 
-.url-play-btn-physical:active {
+.url-play-btn-physical:active,
+.url-play-btn-physical.pressed {
   transform: translateY(3px);
   background: radial-gradient(circle at 50% 10%, #a6a6a6 0%, #b8b8b8 50%, #d5d5d5 100%);
   box-shadow:

@@ -501,8 +501,12 @@ if (urlPlayBtn) {
   urlPlayBtn.addEventListener("click", () => {
     const urlInput = document.getElementById("song-url-input").value.trim();
     if (urlInput) {
-      urlPlayBtn.classList.add("active-led");
+      urlPlayBtn.classList.add("active-led", "pressed");
       urlPlayBtn.disabled = true;
+      const span = urlPlayBtn.querySelector('span');
+      if (span) {
+        span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
+      }
       setTimeout(() => {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('link', urlInput);
