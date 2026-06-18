@@ -177,6 +177,9 @@ function showControls() {
 if (songs[0].mp3link) {
   title.classList.add('loading-text');
   title.textContent = '歌曲加載中 ……';
+  if (fetchProgressContainer) {
+    fetchProgressContainer.style.display = 'block';
+  }
 
   const jsmediatags = window.jsmediatags;
 
@@ -365,7 +368,13 @@ if (songs[0].mp3link) {
   loadAndParseMetadata();
 } else {
   if (songs[0].displayName === '') {
-    showControls();
+    songs[0].displayName = '請輸入歌曲 URL';
+    songs[0].artist = '';
+    loadSong(songs[0]);
+    const inputContainer = document.getElementById("url-input-container");
+    if (inputContainer) {
+      inputContainer.style.display = "flex";
+    }
   }
 }
 
@@ -468,3 +477,26 @@ nextBtn.addEventListener("click", nextSong);
 
 music.addEventListener("timeupdate", updateProgressBar);
 music.addEventListener("ended", nextSong);
+
+// URL input handler
+const urlPlayBtn = document.getElementById("song-url-play-btn");
+if (urlPlayBtn) {
+  urlPlayBtn.addEventListener("click", () => {
+    const urlInput = document.getElementById("song-url-input").value.trim();
+    if (urlInput) {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('link', urlInput);
+      window.location.href = newUrl.href;
+    }
+  });
+  
+  // Add enter key support
+  const urlInputEl = document.getElementById("song-url-input");
+  if (urlInputEl) {
+    urlInputEl.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        urlPlayBtn.click();
+      }
+    });
+  }
+}
