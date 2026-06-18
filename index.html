@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=29" />
+  <link rel="stylesheet" href="./style.css?v=47" />
 </head>
 
 <body>
@@ -97,9 +97,21 @@
         </div>
 
         <div id="url-input-container" class="url-input-container" style="display: none;">
-          <div class="input-wrapper">
-            <i class="fa-solid fa-link input-icon"></i>
-            <input type="text" id="song-url-input" class="url-input" placeholder="輸入 MP3 網址 (https://...)">
+          <div class="tabs-wrapper">
+            <button id="tab-url" class="tab-btn active">網路網址</button>
+            <button id="tab-local" class="tab-btn">本機檔案</button>
+          </div>
+          <div id="mode-url" class="input-mode active">
+            <div class="input-wrapper">
+              <i class="fa-solid fa-link input-icon"></i>
+              <input type="text" id="song-url-input" class="url-input" placeholder="輸入音頻網址 (https://...)">
+            </div>
+          </div>
+          <div id="mode-local" class="input-mode">
+            <div class="input-wrapper" id="fake-file-input-wrapper" style="cursor: pointer;">
+              <i class="fa-solid fa-folder-open input-icon"></i>
+              <input type="text" id="fake-file-input" class="url-input" placeholder="點擊選擇音頻檔案..." readonly style="cursor: pointer;">
+            </div>
           </div>
         </div>
         <h2 id="artist"><a id="artist-link" href="#" target="_blank">&nbsp;</a></h2>
@@ -108,9 +120,10 @@
       </div>
 
       <div id="url-play-btn-wrapper" style="display: none;">
-        <button id="song-url-play-btn" class="url-play-btn-physical">
+        <button id="main-action-btn" class="url-play-btn-physical">
           <span><i class="fa-solid fa-play"></i> 播放</span>
         </button>
+        <input type="file" id="local-upload-input" accept="audio/*" style="display: none;">
       </div>
 
       <div id="bottom-section"
@@ -139,7 +152,7 @@
   <div id="toast">已複製音樂連結！</div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
-  <script src="./script.js?v=24"></script>
+  <script src="./script.js?v=47"></script>
 </body>
 
 </html>

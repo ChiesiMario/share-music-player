@@ -499,7 +499,7 @@ html {
   opacity: 0.8;
 }
 
-/* URL Input Design */
+/* URL / Local Upload Mode Tabs */
 .url-input-container {
   display: flex;
   flex-direction: column;
@@ -507,6 +507,62 @@ html {
   margin-top: 15px;
   width: 100%;
   animation: fadeIn 0.5s ease;
+}
+
+.tabs-wrapper {
+  display: flex;
+  width: 100%;
+  border-bottom: 2px solid rgba(84, 200, 250, 0.2);
+  margin-bottom: 5px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(84, 200, 250, 0.5);
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px; /* Overlap border-bottom */
+}
+
+.tab-btn:hover {
+  color: rgba(84, 200, 250, 0.8);
+}
+
+.tab-btn.active {
+  color: #54c8fa;
+  text-shadow: 0 0 4px #54c8fa;
+  border-bottom: 2px solid #54c8fa;
+}
+
+.input-mode {
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-mode.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+.local-upload-area {
+  width: 100%;
+  padding: 10px;
+  background: rgba(84, 200, 250, 0.05);
+  border: 1px dashed rgba(84, 200, 250, 0.3);
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @keyframes fadeIn {
@@ -579,9 +635,11 @@ html {
 
 #url-play-btn-wrapper {
   width: 100%;
-  margin: 50px 0 10px 0;
+  margin: 45px 0 10px 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .url-play-btn-physical {
@@ -619,7 +677,7 @@ html {
 .url-play-btn-physical::before {
   content: '';
   position: absolute;
-  top: -25px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
   width: 8px;

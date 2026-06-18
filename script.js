@@ -476,7 +476,7 @@ if (songs[0].mp3link) {
   loadAndParseMetadata();
 } else {
   if (songs[0].displayName === '') {
-    songs[0].displayName = '請輸入歌曲 URL';
+    songs[0].displayName = '請輸入歌曲來源';
     songs[0].artist = '';
     loadSong(songs[0]);
     const inputContainer = document.getElementById("url-input-container");
@@ -588,17 +588,63 @@ document.addEventListener("touchend", stopDragging);
 music.addEventListener("timeupdate", updateProgressBar);
 music.addEventListener("ended", nextSong);
 
-// URL input handler
-const urlPlayBtn = document.getElementById("song-url-play-btn");
-if (urlPlayBtn) {
-  urlPlayBtn.addEventListener("click", () => {
-    const urlInput = document.getElementById("song-url-input").value.trim();
+// Tab Switching & Upload Logic
+const mainActionBtn = document.getElementById("main-action-btn");
+const localUploadInput = document.getElementById("local-upload-input");
+const fakeFileInputWrapper = document.getElementById("fake-file-input-wrapper");
+const fakeFileInput = document.getElementById("fake-file-input");
+const urlInputEl = document.getElementById("song-url-input");
 
-    if (!urlInput) {
-      showToast("請輸入歌曲的網址！");
-      return;
+const tabUrl = document.getElementById("tab-url");
+const tabLocal = document.getElementById("tab-local");
+const modeUrl = document.getElementById("mode-url");
+const modeLocal = document.getElementById("mode-local");
+let currentMode = 'url';
+
+if (mainActionBtn && localUploadInput) {
+  if (tabUrl && tabLocal) {
+    tabUrl.addEventListener("click", () => {
+      currentMode = 'url';
+      tabUrl.classList.add("active");
+      tabLocal.classList.remove("active");
+      modeUrl.classList.add("active");
+      modeLocal.classList.remove("active");
+    });
+
+    tabLocal.addEventListener("click", () => {
+      currentMode = 'local';
+      tabLocal.classList.add("active");
+      tabUrl.classList.remove("active");
+      modeLocal.classList.add("active");
+      modeUrl.classList.remove("active");
+    });
+  }
+
+  if (fakeFileInputWrapper) {
+    fakeFileInputWrapper.addEventListener("click", () => {
+      localUploadInput.click();
+    });
+  }
+
+  // Main Action Button Handler
+  mainActionBtn.addEventListener("click", () => {
+    if (currentMode === 'url') {
+      const urlInput = urlInputEl ? urlInputEl.value.trim() : "";
+      if (urlInput) {
+        processUrl(urlInput);
+      } else {
+        showToast("請輸入音頻網址！");
+      }
+    } else {
+      if (localUploadInput.files && localUploadInput.files.length > 0) {
+        processLocalFile(localUploadInput.files[0]);
+      } else {
+        showToast("請點擊上方選擇本機檔案！");
+      }
     }
+  });
 
+  function processUrl(urlInput) {
     try {
       new URL(urlInput);
     } catch (e) {
@@ -606,9 +652,9 @@ if (urlPlayBtn) {
       return;
     }
 
-    urlPlayBtn.classList.add("active-led", "pressed");
-    urlPlayBtn.disabled = true;
-    const span = urlPlayBtn.querySelector('span');
+    mainActionBtn.classList.add("active-led", "pressed");
+    mainActionBtn.disabled = true;
+    const span = mainActionBtn.querySelector('span');
     if (span) {
       span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
     }
@@ -617,14 +663,97 @@ if (urlPlayBtn) {
       newUrl.searchParams.set('link', urlInput);
       window.location.href = newUrl.href;
     }, 2000);
-  });
+  }
 
-  // Add enter key support
-  const urlInputEl = document.getElementById("song-url-input");
+  function processLocalFile(file) {
+    mainActionBtn.classList.add("active-led", "pressed");
+    mainActionBtn.disabled = true;
+    const span = mainActionBtn.querySelector('span');
+    if (span) {
+      span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
+    }
+
+    setTimeout(() => {
+      const objectUrl = URL.createObjectURL(file);
+      
+      songs[0] = {
+        name: file.name,
+        displayName: file.name.replace(/\.[^/.]+$/, ""),
+        artist: '',
+        mp3link: objectUrl,
+        cover: null,
+        album: '',
+        year: ''
+      };
+
+      const inputContainer = document.getElementById("url-input-container");
+      if (inputContainer) inputContainer.style.display = "none";
+      const playBtnWrapper = document.getElementById("url-play-btn-wrapper");
+      if (playBtnWrapper) playBtnWrapper.style.display = "none";
+
+      title.textContent = '讀取 ID3 標籤中...';
+      title.classList.add('loading-text');
+
+      const jsmediatags = window.jsmediatags;
+      if (jsmediatags) {
+        jsmediatags.read(file, {
+          onSuccess: (tag) => {
+            const tags = tag.tags;
+            songs[0].displayName = tags.title || songs[0].displayName;
+            songs[0].artist = tags.artist || '未知歌手';
+            songs[0].album = tags.album || '';
+            songs[0].year = tags.year || '';
+
+            if (tags.picture) {
+              const data = tags.picture.data;
+              const format = tags.picture.format;
+              const byteArray = new Uint8Array(data);
+              const blob = new Blob([byteArray], { type: format });
+
+              const reader = new FileReader();
+              reader.onload = function (evt) {
+                songs[0].cover = evt.target.result;
+                showControls();
+                loadSong(songs[0]);
+                document.getElementById("play").click(); // Auto-play
+              };
+              reader.readAsDataURL(blob);
+            } else {
+              showControls();
+              loadSong(songs[0]);
+              document.getElementById("play").click(); // Auto-play
+            }
+          },
+          onError: (err) => {
+            console.warn('Local file ID3 parse failed:', err);
+            showControls();
+            loadSong(songs[0]);
+            document.getElementById("play").click(); // Auto-play
+          }
+        });
+      } else {
+        showControls();
+        loadSong(songs[0]);
+        document.getElementById("play").click(); // Auto-play
+      }
+    }, 2000);
+  }
+
+  // Local file input change handler: only update the fake input text
+  if (localUploadInput) {
+    localUploadInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file && fakeFileInput) {
+        fakeFileInput.value = file.name;
+      }
+    });
+  }
+
+  // Add enter key support for URL input
   if (urlInputEl) {
     urlInputEl.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
-        urlPlayBtn.click();
+        mainActionBtn.click();
       }
     });
   }
@@ -750,8 +879,47 @@ function playClickSound() {
   osc.stop(t + 0.05);
 }
 
+// --- Touch Screen Sound Synthesis (LCD Screen) ---
+function playTouchSound() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+
+  const t = audioCtx.currentTime;
+
+  // Short electronic "tick" for touch screen
+  const osc = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1000, t); // High pitch beep
+  osc.frequency.exponentialRampToValueAtTime(300, t + 0.05); // Quick pitch drop
+
+  // Very short, snappy envelope
+  gainNode.gain.setValueAtTime(0, t);
+  gainNode.gain.linearRampToValueAtTime(0.15, t + 0.01);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+
+  osc.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  osc.start(t);
+  osc.stop(t + 0.06);
+}
+
 // Attach physical sound to all buttons
 document.addEventListener('mousedown', (e) => {
+  // LCD Touch Screen elements
+  const touchElem = e.target.closest('.tab-btn, #fake-file-input-wrapper, #fake-file-input');
+  if (touchElem) {
+    playTouchSound();
+    return; // Prevent physical sound
+  }
+
+  // Physical buttons
   const btn = e.target.closest('button, .nav-btn, .url-play-btn-physical, .btn-play');
   if (btn && !btn.disabled && !btn.classList.contains('active-led')) {
     playClickSound();
