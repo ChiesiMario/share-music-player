@@ -1,60 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- begin open graph tags -->
-    <meta property="og:title" content="Music Player" />
-    <meta property="og:type" content="website" />
-    <!-- end open graph tags -->
-    <!-- begin traditional metadata tags -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- end traditional metadata tags -->
+    <meta property="og:title" content="Music Player" />
+    <meta property="og:type" content="website" />
     <title>Music Share</title>
-    <link
-      rel="icon"
-      type="image/png"
-      href="./img/logo.png"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-    />
+    
+    <link rel="icon" type="image/png" href="./img/logo.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div class="text">
-          <p>Someone shared this song with you,<br>
-            <p2>Enjoy it!</p2></p>
-       </div>
-    <div class="player-container">
-      <!-- song -->
-      <div class="img-container">
-        <img
-          src="./img/logo.png"
-          alt=" "
-        />
+    <div class="player-wrapper">
+      <!-- Dynamic Blurred Background -->
+      <div class="bg-blur-container">
+        <div class="bg-blur" id="background"></div>
       </div>
-      <h2 id="title"></h2>
-      <h3 id="artist"></h3>
-      <audio src=""></audio>
-      <!-- progress -->
-      <div class="progress-container" id="progress-container">
-        <!-- this progress is the seek of the song, as the song goes -->
-        <div class="progress" id="progress"></div>
-        <div class="duration-wrapper">
-          <span id="current-time">0:00</span>
-          <span id="duration">Waiting to play</span>
+      
+      <!-- Main Player Card -->
+      <div class="player-card">
+        
+        <div class="artwork-container">
+          <div class="default-cover" id="default-cover">
+            <div class="share-card-modern">
+              <div class="eq-bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+              <div class="share-text-modern">
+                <span class="share-highlight">Music Share</span>
+                <span class="share-label">音 樂 分 享</span>
+              </div>
+            </div>
+          </div>
+          <img id="cover" src="" alt="Cover Art" style="display: none;" />
         </div>
-      </div>
-      <!-- controls  -->
-      <div class="player-controls">
-        <i class="fa-solid fa-backward" id="prev" title="Previous"></i>
-        <i class="fa-solid fa-play main-button" id="play" title="Play"></i>
-        <i class="fa-solid fa-forward" id="next" title="Next"></i>
+        
+        <div class="track-info">
+          <h1 id="title">&nbsp;</h1>
+          <div id="fetch-progress-container" class="fetch-progress">
+            <div id="fetch-progress-bar"></div>
+          </div>
+          <h2 id="artist"><a id="artist-link" href="#" target="_blank">&nbsp;</a></h2>
+          <h3 id="album"><a id="album-link" href="#" target="_blank">&nbsp;</a></h3>
+          <h4 id="year">&nbsp;</h4>
+        </div>
+        
+        <div id="bottom-section" style="display: grid; grid-template-rows: 0fr; opacity: 0; pointer-events: none; transition: grid-template-rows 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease; width: 100%;">
+          <div style="overflow: hidden; min-height: 0;">
+            <div class="progress-area" id="progress-area">
+              <div class="progress-bar-bg" id="progress-container">
+                <div class="progress-fill" id="progress"></div>
+              </div>
+              <div class="time-labels">
+                <span id="current-time">0:00</span>
+                <span id="duration">-:-</span>
+              </div>
+            </div>
+            
+            <div class="controls" id="controls">
+              <i class="fa-solid fa-backward-step btn-skip" id="prev"></i>
+              <i class="fa-solid fa-play btn-play" id="play" title="Play"></i>
+              <i class="fa-solid fa-forward-step btn-skip" id="next"></i>
+            </div>
+          </div>
+        </div>
+        
+        <audio id="audio" src=""></audio>
       </div>
     </div>
-    <!-- script -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>
