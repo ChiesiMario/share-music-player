@@ -401,20 +401,23 @@ if (songs[0].mp3link) {
   }
 
   const loadAndParseMetadata = async () => {
-    // 1. Initial attempt using direct URL
-    try {
-      await new Promise((resolve, reject) => {
-        jsmediatags.read(songs[0].mp3link, {
-          onSuccess: (tag) => {
-            processTag(tag);
-            resolve();
-          },
-          onError: reject
+    // 1. Initial attempt using direct URL (Skip for GitHub raw due to lack of OPTIONS support)
+    const isGitHubRaw = songs[0].mp3link.includes('raw.githubusercontent.com');
+    if (!isGitHubRaw) {
+      try {
+        await new Promise((resolve, reject) => {
+          jsmediatags.read(songs[0].mp3link, {
+            onSuccess: (tag) => {
+              processTag(tag);
+              resolve();
+            },
+            onError: reject
+          });
         });
-      });
-      return; // Success!
-    } catch (error) {
-      console.log('Range request failed, falling back to robust fetch...', error);
+        return; // Success!
+      } catch (error) {
+        console.log('Range request failed, falling back to robust fetch...', error);
+      }
     }
 
     // 2. Fallback to robust resumable download
@@ -428,6 +431,12 @@ if (songs[0].mp3link) {
 
     try {
       blob = await fetchWithResume(cacheBusterUrl, 3); // 3 retries
+      
+      // FIX: Since we already downloaded the full file into memory to parse ID3 tags,
+      // we can convert it into a Blob URL. This prevents the <audio> element from 
+      // making a second network request to stream the file again!
+      songs[0].mp3link = URL.createObjectURL(blob);
+      
     } catch (err) {
       console.error('All fetch retries failed:', err);
       if (fetchProgressContainer) fetchProgressContainer.style.display = 'none';
