@@ -315,7 +315,7 @@ html {
 
 .track-info h1 {
   color: #54c8fa;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 4px;
@@ -355,7 +355,7 @@ html {
 
 .track-info h2 {
   color: #3aa6d4;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 2px;
@@ -366,7 +366,7 @@ html {
 }
 
 .track-info h3 {
-  font-family: "Courier New", Courier, monospace;
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-size: 12px;
   font-weight: bold;
   margin-bottom: 2px;
@@ -378,7 +378,7 @@ html {
 }
 
 .track-info h4 {
-  font-family: "Courier New", Courier, monospace;
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-size: 10px;
   font-weight: bold;
   margin: 0;
@@ -449,7 +449,7 @@ html {
   /* slight cyan tint */
   color: #54c8fa;
   /* Glowing cyan text */
-  font-family: "Courier New", Courier, monospace;
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
   /* Match the title font */
   font-size: 14px;
   outline: none;
