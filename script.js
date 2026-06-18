@@ -65,12 +65,8 @@ function updateVisualizer() {
     let useFake = true;
     
     if (isAnalyzerSetup && analyserNode) {
+      useFake = false; // Always trust the analyzer if it's setup (even for silence)
       analyserNode.getByteFrequencyData(visualizerDataArray);
-      let sum = 0;
-      for (let i = 0; i < visualizerDataArray.length; i++) {
-        sum += visualizerDataArray[i];
-      }
-      if (sum > 0) useFake = false;
     }
     
     bars.forEach((bar, index) => {
