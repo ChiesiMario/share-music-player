@@ -3,6 +3,7 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 const port = 8000;
@@ -52,16 +53,77 @@ app.post('/upload', upload.single('musicFile'), (req, res) => {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
 
-  // Construct the URL to access the uploaded file
-  // Using relative path so it works regardless of domain/port
-  const fileUrl = `./uploads/${req.file.filename}`;
+  const tempPath = req.file.path;
+  const hash = crypto.createHash('md5');
+  const stream = fs.createReadStream(tempPath);
 
-  res.json({
-    message: 'File uploaded successfully',
-    url: fileUrl,
-    filename: req.file.originalname
+  stream.on('data', (data) => {
+    hash.update(data);
+  });
+
+  stream.on('end', () => {
+    const md5Hex = hash.digest('hex');
+    const ext = path.extname(req.file.originalname);
+    const newFilename = md5Hex + ext;
+    const finalPath = path.join(uploadDir, newFilename);
+
+    if (fs.existsSync(finalPath)) {
+      // File already exists, update mtime to reset the 36-hour timer
+      const now = new Date();
+      fs.utimesSync(finalPath, now, now);
+      // Delete the temp file since we don't need it
+      fs.unlinkSync(tempPath);
+    } else {
+      // Rename temp file to final md5 name
+      fs.renameSync(tempPath, finalPath);
+    }
+
+    const fileUrl = `./uploads/${newFilename}`;
+
+    res.json({
+      message: 'File uploaded successfully',
+      url: fileUrl,
+      filename: req.file.originalname
+    });
+  });
+
+  stream.on('error', (err) => {
+    console.error('Error hashing file:', err);
+    res.status(500).json({ error: 'Error processing file' });
   });
 });
+// --- File Cleanup Mechanism ---
+// Check and delete files older than 36 hours
+const MAX_AGE_MS = 36 * 60 * 60 * 1000;
+
+function cleanupOldFiles() {
+  fs.readdir(uploadDir, (err, files) => {
+    if (err) {
+      console.error('Error reading uploads directory for cleanup:', err);
+      return;
+    }
+    
+    const now = Date.now();
+    files.forEach(file => {
+      const filePath = path.join(uploadDir, file);
+      fs.stat(filePath, (err, stats) => {
+        if (err) return;
+        
+        if (now - stats.mtimeMs > MAX_AGE_MS) {
+          fs.unlink(filePath, err => {
+            if (err) console.error(`Failed to delete old file ${file}:`, err);
+            else console.log(`Deleted old file: ${file}`);
+          });
+        }
+      });
+    });
+  });
+}
+
+// Run cleanup every hour
+setInterval(cleanupOldFiles, 60 * 60 * 1000);
+// Also run once on startup
+cleanupOldFiles();
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);

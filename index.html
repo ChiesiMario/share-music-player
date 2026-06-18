@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=49" />
+  <link rel="stylesheet" href="./style.css?v=50" />
 </head>
 
 <body>
@@ -110,12 +110,17 @@
           <div id="mode-local" class="input-mode">
             <div class="input-wrapper" id="fake-file-input-wrapper" style="cursor: pointer;">
               <i class="fa-solid fa-folder-open input-icon"></i>
-              <input type="text" id="fake-file-input" class="url-input" placeholder="點擊選擇音頻檔案以上傳..." readonly style="cursor: pointer;">
+              <input type="text" id="fake-file-input" class="url-input" placeholder="點擊選擇音頻檔案以上傳..." readonly
+                style="cursor: pointer;">
             </div>
             <div class="input-wrapper" style="margin-top: 8px;">
               <i class="fa-solid fa-lock input-icon"></i>
               <input type="password" id="upload-password-input" class="url-input" placeholder="請輸入伺服器密碼">
             </div>
+            <p
+              style="font-size: 10px; color: rgba(84, 200, 250, 0.7); text-align: left; margin-top: 8px; margin-bottom: 0; font-family: 'Inter', sans-serif;">
+              <i class="fa-solid fa-circle-info"></i> 上傳的文件會在 36 小時後刪除
+            </p>
           </div>
         </div>
         <h2 id="artist"><a id="artist-link" href="#" target="_blank">&nbsp;</a></h2>
@@ -156,7 +161,7 @@
   <div id="toast">已複製音樂連結！</div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
-  <script src="./script.js?v=49"></script>
+  <script src="./script.js?v=50"></script>
 </body>
 
 </html>
