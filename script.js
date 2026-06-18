@@ -669,20 +669,23 @@ if (mainActionBtn && localUploadInput) {
     const passwordInput = document.getElementById('upload-password-input');
     const password = passwordInput ? passwordInput.value : '';
 
-    mainActionBtn.classList.add("uploading-led", "pressed");
+    mainActionBtn.classList.add("pressed"); // 剛點擊時不亮燈
     mainActionBtn.disabled = true;
     const span = mainActionBtn.querySelector('span');
     if (span) {
-      span.innerHTML = '<i class="fa-solid fa-shield-halved fa-beat"></i> 驗證密碼中...';
+      span.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 準備中...';
     }
 
-    const progressBar = document.getElementById('upload-progress-bar');
-    if (progressBar) {
-      progressBar.style.display = 'block';
-      progressBar.style.width = '0%';
-    }
+    const progressContainer = document.getElementById('lcd-upload-progress-container');
+    const progressTrack = document.getElementById('lcd-upload-progress-track');
+    const progressBar = document.getElementById('lcd-upload-progress-bar');
+    const progressText = document.getElementById('lcd-upload-progress-text');
 
+    // 等待 1s 後驗證密碼
     setTimeout(() => {
+      if (span) {
+        span.innerHTML = '<i class="fa-solid fa-shield-halved fa-beat"></i> 驗證密碼...';
+      }
       fetch('/verify-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -694,8 +697,15 @@ if (mainActionBtn && localUploadInput) {
         return res.json();
       })
       .then(() => {
+        // 驗證成功：顯示進度條、點亮紅色呼吸燈，開始上傳
+          if (progressContainer) {
+            progressContainer.style.display = 'block';
+          }if (progressBar) progressBar.style.width = '0%';
+        if (progressText) progressText.textContent = '0%';
+
+        mainActionBtn.classList.add("uploading-led");
         if (span) {
-          span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 準備上傳...';
+          span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中...';
         }
 
         const formData = new FormData();
@@ -707,10 +717,30 @@ if (mainActionBtn && localUploadInput) {
         xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable) {
             const percentComplete = Math.round((e.loaded / e.total) * 100);
-            if (progressBar) progressBar.style.width = percentComplete + '%';
-            if (span) {
-              span.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中... ${percentComplete}%`;
+            if (progressBar) {
+              progressBar.style.width = percentComplete + '%';
+              
+              if (percentComplete < 50) {
+                progressBar.style.backgroundColor = '#aaaaaa';
+                progressBar.style.boxShadow = '0 0 8px rgba(170, 170, 170, 0.8)';
+                if (progressTrack) {
+                  progressTrack.style.borderColor = '#aaaaaa';
+                  progressTrack.style.boxShadow = '0 0 8px rgba(170, 170, 170, 0.4)';
+                }
+              } else {
+                const ratio = (percentComplete - 50) / 50; // 0 to 1
+                const r = Math.round(170 + (84 - 170) * ratio);
+                const g = Math.round(170 + (200 - 170) * ratio);
+                const b = Math.round(170 + (250 - 170) * ratio);
+                progressBar.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                progressBar.style.boxShadow = `0 0 8px rgba(${r}, ${g}, ${b}, 0.8)`;
+                if (progressTrack) {
+                  progressTrack.style.borderColor = `rgb(${r}, ${g}, ${b})`;
+                  progressTrack.style.boxShadow = `0 0 8px rgba(${r}, ${g}, ${b}, 0.4)`;
+                }
+              }
             }
+            if (progressText) progressText.textContent = percentComplete + '%';
           }
         });
 
@@ -727,15 +757,16 @@ if (mainActionBtn && localUploadInput) {
                 newUrl.searchParams.set('link', serverUrl);
                 newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
                 
+                // 上傳完成：切換為綠色 LED
                 mainActionBtn.classList.remove("uploading-led");
                 mainActionBtn.classList.add("active-led");
                 if (span) {
                   span.innerHTML = '<i class="fa-solid fa-check"></i> 上傳完成';
                 }
-                if (progressBar) {
-                  progressBar.style.width = '100%';
-                }
+                if (progressBar) progressBar.style.width = '100%';
+                if (progressText) progressText.textContent = '100%';
 
+                // 等待 1s 後進入播放
                 setTimeout(() => {
                   window.location.href = newUrl.href;
                 }, 1000);
@@ -772,7 +803,7 @@ if (mainActionBtn && localUploadInput) {
     }, 1000);
 
     function resetUploadUI() {
-      if (progressBar) progressBar.style.display = 'none';
+      if (progressContainer) progressContainer.style.display = 'none';
       mainActionBtn.classList.remove("uploading-led", "active-led", "pressed");
       mainActionBtn.disabled = false;
       if (span) {
