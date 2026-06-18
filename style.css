@@ -371,12 +371,19 @@ html {
   font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 4px;
+  
+  /* Fix shadow clipping by expanding the overflow box */
+  padding: 10px 4px;
+  margin-top: -10px;
+  margin-bottom: -6px; /* original was 4px, so -10 + 4 = -6 */
+  margin-left: -4px;
+  margin-right: -4px;
+  
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 0 8px rgba(84, 200, 250, 0.8), 0 0 2px rgba(255, 255, 255, 0.3);
-  /* Stronger glow to cut through green bars */
+  text-shadow: 0 0 4px rgba(84, 200, 250, 0.5), 0 0 1px rgba(255, 255, 255, 0.2);
+  /* Lighter glow */
   text-transform: uppercase;
 }
 
@@ -490,7 +497,7 @@ html {
   color: #54c8fa;
   /* Cyan glow */
   font-size: 14px;
-  text-shadow: 0 0 5px rgba(84, 200, 250, 0.5);
+  text-shadow: 0 0 3px rgba(84, 200, 250, 0.4);
 }
 
 .url-input {
@@ -507,10 +514,10 @@ html {
   /* Match the title font */
   font-size: 14px;
   outline: none;
-  box-shadow:
-    0 0 8px rgba(84, 200, 250, 0.1),
-    inset 0 0 8px rgba(84, 200, 250, 0.1);
-  text-shadow: 0 0 8px rgba(84, 200, 250, 0.6);
+  box-shadow: 
+    0 0 4px rgba(84, 200, 250, 0.1), 
+    inset 0 0 4px rgba(84, 200, 250, 0.1);
+  text-shadow: 0 0 2px rgba(84, 200, 250, 0.3);
   transition: all 0.2s ease;
 }
 
@@ -521,16 +528,16 @@ html {
 }
 
 .url-input:focus {
-  background: rgba(84, 200, 250, 0.1);
   border-color: #54c8fa;
-  box-shadow:
-    0 0 12px rgba(84, 200, 250, 0.3),
-    inset 0 0 12px rgba(84, 200, 250, 0.2);
+  box-shadow: 
+    0 0 8px rgba(84, 200, 250, 0.2), 
+    inset 0 0 4px rgba(84, 200, 250, 0.1);
+  background: rgba(15, 22, 20, 1);
 }
 
 .input-wrapper:focus-within .input-icon {
   color: #fff;
-  text-shadow: 0 0 8px #54c8fa;
+  text-shadow: 0 0 4px #54c8fa;
 }
 
 #url-play-btn-wrapper {
@@ -734,12 +741,13 @@ html {
   color: #333;
 }
 
-.controls i:active {
-  transform: translateY(2px);
+.controls i:active,
+.controls i.pressed {
+  transform: translateY(3px);
   background: radial-gradient(circle at 50% 10%, #a6a6a6 0%, #b8b8b8 50%, #d5d5d5 100%);
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .controls i.fa-pause {

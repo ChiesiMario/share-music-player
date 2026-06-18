@@ -135,6 +135,7 @@ let playTimeout;
 function playSong() {
   isPlaying = true;
   playBtn.classList.replace("fa-play", "fa-pause");
+  playBtn.classList.add("pressed");
   playBtn.setAttribute("title", "Pause");
   controls.classList.add("playing");
 
@@ -155,6 +156,7 @@ function playSong() {
 function pauseSong() {
   isPlaying = false;
   playBtn.classList.replace("fa-pause", "fa-play");
+  playBtn.classList.remove("pressed");
   playBtn.setAttribute("title", "Play");
   controls.classList.remove("playing");
 
