@@ -105,89 +105,125 @@ html {
   position: relative;
 }
 
+/* =========================================
+   Skeuomorphic Vinyl Record Design
+   ========================================= */
+
+/* The Turntable Platter / Container */
 .share-card-modern {
   z-index: 2;
+  width: 100%;
+  height: 100%;
+  background: transparent; /* Removed black slipmat */
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
+  position: relative;
 }
 
+/* The Vinyl Record */
+.share-card-modern::before {
+  content: '';
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: 
+    repeating-radial-gradient(
+      circle,
+      #181818 0px,
+      #181818 2px,
+      #111 3px,
+      #181818 4px
+    );
+  box-shadow: 
+    0 10px 20px rgba(0,0,0,0.8), /* Drop shadow */
+    inset 0 0 4px rgba(255,255,255,0.3); /* Outer edge shine */
+  z-index: 1;
+  animation: spin-vinyl 4s linear infinite;
+}
+
+/* Vinyl Gloss / Light Reflection */
+.share-card-modern::after {
+  content: '';
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 45deg,
+    rgba(255,255,255,0) 0deg,
+    rgba(255,255,255,0.1) 15deg,
+    rgba(255,255,255,0) 30deg,
+    rgba(255,255,255,0) 180deg,
+    rgba(255,255,255,0.1) 195deg,
+    rgba(255,255,255,0) 210deg,
+    rgba(255,255,255,0) 360deg
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes spin-vinyl {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hide the old eq-bars */
 .eq-bars {
-  display: flex;
-  gap: 6px;
-  align-items: flex-end;
-  height: 40px;
+  display: none !important;
 }
 
-.eq-bars .bar {
-  width: 6px;
-  background: #00ffd5;
-  /* Glowing cyan LED */
-  border-radius: 2px;
-  /* Sharper synth look */
-  box-shadow: 0 0 8px rgba(0, 255, 213, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.8);
-  animation: eq-bounce 1s infinite ease-in-out alternate;
-}
-
-.eq-bars .bar:nth-child(1) {
-  height: 15px;
-  animation-delay: 0.1s;
-}
-
-.eq-bars .bar:nth-child(2) {
-  height: 35px;
-  animation-delay: 0.3s;
-}
-
-.eq-bars .bar:nth-child(3) {
-  height: 25px;
-  animation-delay: 0.2s;
-}
-
-.eq-bars .bar:nth-child(4) {
-  height: 10px;
-  animation-delay: 0.4s;
-}
-
-@keyframes eq-bounce {
-  0% {
-    transform: scaleY(0.8);
-  }
-
-  100% {
-    transform: scaleY(1.2);
-  }
-}
-
+/* Typography on the Record Label */
 .share-text-modern {
+  position: absolute;
+  z-index: 4;
+  width: 42%;
+  aspect-ratio: 1/1;
+  background: linear-gradient(135deg, #ff6b6b, #c0392b); /* Rich red label */
+  border-radius: 50%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.6);
+  animation: spin-vinyl 4s linear infinite;
+}
+
+/* The spindle hole */
+.share-text-modern::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d4d8db; /* Metal spindle */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.3);
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .share-label {
-  font-size: 13px;
+  font-size: 8px;
   font-weight: 700;
-  color: #333;
-  /* Sharp silkscreen printed text */
-  letter-spacing: 6px;
-  margin-left: 6px;
-  /* Offset to center text with letter-spacing */
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  /* Subtle paint thickness */
+  color: #ffeaa7; /* Vintage yellow text */
+  letter-spacing: 3px;
+  margin-top: 12px; /* Push below spindle */
+  margin-left: 3px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
 
 .share-highlight {
-  font-size: 26px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
   font-weight: 900;
-  color: #2b2b2b;
-  /* Sharp silkscreen printed text */
-  letter-spacing: 2px;
+  color: #fff;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  /* Subtle paint thickness */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  margin-bottom: 12px; /* Push above spindle */
 }
 
 /* The Album Art Tile sitting inside the tray */
@@ -371,14 +407,15 @@ html {
   font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-size: 18px;
   font-weight: bold;
-  
+
   /* Fix shadow clipping by expanding the overflow box */
   padding: 10px 4px;
   margin-top: -10px;
-  margin-bottom: -6px; /* original was 4px, so -10 + 4 = -6 */
+  margin-bottom: -6px;
+  /* original was 4px, so -10 + 4 = -6 */
   margin-left: -4px;
   margin-right: -4px;
-  
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -514,8 +551,8 @@ html {
   /* Match the title font */
   font-size: 14px;
   outline: none;
-  box-shadow: 
-    0 0 4px rgba(84, 200, 250, 0.1), 
+  box-shadow:
+    0 0 4px rgba(84, 200, 250, 0.1),
     inset 0 0 4px rgba(84, 200, 250, 0.1);
   text-shadow: 0 0 2px rgba(84, 200, 250, 0.3);
   transition: all 0.2s ease;
@@ -529,8 +566,8 @@ html {
 
 .url-input:focus {
   border-color: #54c8fa;
-  box-shadow: 
-    0 0 8px rgba(84, 200, 250, 0.2), 
+  box-shadow:
+    0 0 8px rgba(84, 200, 250, 0.2),
     inset 0 0 4px rgba(84, 200, 250, 0.1);
   background: rgba(15, 22, 20, 1);
 }
@@ -809,43 +846,52 @@ html {
 
 /* Responsive Scaling for Short Screens */
 @media (max-height: 850px) {
+
   /* 1. 先縮小主頁和分享按鈕 */
   .nav-btn {
     width: 36px;
     height: 36px;
     font-size: 14px;
   }
+
   .top-nav {
     margin-bottom: min(2vh, 10px);
   }
+
   .player-wrapper {
     padding: max(2vh, 10px) 0;
   }
 }
 
 @media (max-height: 750px) {
+
   /* 2. 再縮小播放按鈕 */
   .controls i {
     width: 60px;
     height: 60px;
     font-size: 20px;
   }
+
   .controls {
     margin: 15px auto 15px auto;
   }
+
   .player-card {
     padding: min(3vh, 24px) min(4vw, 24px);
   }
+
   .track-info {
     margin-bottom: min(2vh, 10px);
     padding: min(2vh, 14px) 12px;
   }
+
   #url-play-btn-wrapper {
     margin: 30px 0 min(2vh, 10px) 0;
   }
 }
 
 @media (max-height: 650px) {
+
   /* 3. 最後才縮小封面與整體留白 */
   .artwork-container {
     width: min(55%, 35vh);
