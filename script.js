@@ -666,77 +666,58 @@ if (mainActionBtn && localUploadInput) {
   }
 
   function processLocalFile(file) {
+    const passwordInput = document.getElementById('upload-password-input');
+    const password = passwordInput ? passwordInput.value : '';
+
     mainActionBtn.classList.add("active-led", "pressed");
     mainActionBtn.disabled = true;
     const span = mainActionBtn.querySelector('span');
     if (span) {
-      span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
+      span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中...';
     }
 
-    setTimeout(() => {
-      const objectUrl = URL.createObjectURL(file);
-      
-      songs[0] = {
-        name: file.name,
-        displayName: file.name.replace(/\.[^/.]+$/, ""),
-        artist: '',
-        mp3link: objectUrl,
-        cover: null,
-        album: '',
-        year: ''
-      };
+    const formData = new FormData();
+    formData.append('musicFile', file);
+    formData.append('password', password);
 
-      const inputContainer = document.getElementById("url-input-container");
-      if (inputContainer) inputContainer.style.display = "none";
-      const playBtnWrapper = document.getElementById("url-play-btn-wrapper");
-      if (playBtnWrapper) playBtnWrapper.style.display = "none";
-
-      title.textContent = '讀取 ID3 標籤中...';
-      title.classList.add('loading-text');
-
-      const jsmediatags = window.jsmediatags;
-      if (jsmediatags) {
-        jsmediatags.read(file, {
-          onSuccess: (tag) => {
-            const tags = tag.tags;
-            songs[0].displayName = tags.title || songs[0].displayName;
-            songs[0].artist = tags.artist || '未知歌手';
-            songs[0].album = tags.album || '';
-            songs[0].year = tags.year || '';
-
-            if (tags.picture) {
-              const data = tags.picture.data;
-              const format = tags.picture.format;
-              const byteArray = new Uint8Array(data);
-              const blob = new Blob([byteArray], { type: format });
-
-              const reader = new FileReader();
-              reader.onload = function (evt) {
-                songs[0].cover = evt.target.result;
-                showControls();
-                loadSong(songs[0]);
-                document.getElementById("play").click(); // Auto-play
-              };
-              reader.readAsDataURL(blob);
-            } else {
-              showControls();
-              loadSong(songs[0]);
-              document.getElementById("play").click(); // Auto-play
-            }
-          },
-          onError: (err) => {
-            console.warn('Local file ID3 parse failed:', err);
-            showControls();
-            loadSong(songs[0]);
-            document.getElementById("play").click(); // Auto-play
-          }
-        });
-      } else {
-        showControls();
-        loadSong(songs[0]);
-        document.getElementById("play").click(); // Auto-play
+    fetch('/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (response.status === 401) {
+        throw new Error('UNAUTHORIZED');
       }
-    }, 2000);
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.url) {
+        // Construct the full URL for sharing
+        const serverUrl = new URL(data.url, window.location.origin).href;
+        
+        // Append it to the query string and reload so it's shareable
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('link', serverUrl);
+        newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
+        window.location.href = newUrl.href;
+      }
+    })
+    .catch(error => {
+      console.error('Error uploading file:', error);
+      if (error.message === 'UNAUTHORIZED') {
+        showToast('密碼錯誤，拒絕上傳！');
+      } else {
+        showToast('上傳失敗，請確認伺服器已啟動！');
+      }
+      mainActionBtn.classList.remove("active-led", "pressed");
+      mainActionBtn.disabled = false;
+      if (span) {
+        span.innerHTML = '<i class="fa-solid fa-play"></i> 播放';
+      }
+    });
   }
 
   // Local file input change handler: only update the fake input text

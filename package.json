@@ -1,0 +1,26 @@
+{
+  "name": "share-music-player",
+  "version": "1.0.0",
+  "description": "一个网页音乐播放器，可以播放来自 URL 的音乐文件。用于自建的本地音乐库对外的分享。",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChiesiMario/share-music-player.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ChiesiMario/share-music-player/issues"
+  },
+  "homepage": "https://github.com/ChiesiMario/share-music-player#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "multer": "^2.2.0"
+  }
+}
