@@ -23,17 +23,19 @@ body, html {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 40px 0;
 }
 
 /* Dynamic Blurred Background Container (GPU Isolated) */
 .bg-blur-container {
-  position: absolute;
+  position: fixed;
   inset: 0;
   overflow: hidden;
   z-index: 0;
+  pointer-events: none;
   transform: translateZ(0); /* Force GPU rasterization to prevent dirty rect repaint bugs */
 }
 
@@ -61,11 +63,12 @@ body, html {
 .player-card {
   width: 90%;
   max-width: 400px;
+  margin: auto;
   background: rgba(255, 255, 255, 0.05); /* Increased transparency for better blur */
   backdrop-filter: blur(40px) saturate(150%);
   -webkit-backdrop-filter: blur(40px) saturate(150%);
   border-radius: 30px;
-  padding: 30px;
+  padding: 24px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden; /* Perfectly clips the pseudo-element's backdrop-filter in Firefox and Chrome */
@@ -87,9 +90,9 @@ body, html {
 
 /* Artwork */
 .artwork-container {
-  width: 100%;
+  width: 75%;
+  margin: 0 auto 20px auto;
   aspect-ratio: 1 / 1;
-  margin-bottom: 30px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -181,54 +184,55 @@ body, html {
   display: block;
 }
 
-/* Artwork Share Button */
-.artwork-share-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.9);
-  width: 40px;
-  height: 40px;
+/* Top Navigation Bar */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 15px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.top-nav.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  width: 44px;
+  height: 44px;
+  border: none;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  z-index: 10;
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  font-size: 18px;
 }
 
-.artwork-share-btn.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.artwork-share-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  transform: scale(1.1);
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  transform: scale(1.05);
 }
 
-.artwork-share-btn:active {
+.nav-btn:active {
   transform: scale(0.95);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Track Info */
 .track-info {
-  text-align: left;
-  margin-bottom: 25px;
+  text-align: center; /* Center align text to match the centered artwork */
+  margin-bottom: 15px;
   width: 100%;
-  min-height: 95px; /* Changed from fixed height to min-height */
+  min-height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -236,7 +240,7 @@ body, html {
 
 .track-info h1 {
   color: #fff;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   margin-bottom: 4px;
   white-space: nowrap;
@@ -411,8 +415,8 @@ body, html {
 /* Progress Area */
 .progress-area {
   width: 100%;
-  padding: 10px 12px 0;
-  margin-bottom: 30px;
+  padding: 5px 12px 0;
+  margin-bottom: 15px;
 }
 
 .progress-bar-bg {
@@ -507,8 +511,11 @@ body, html {
 
 @media screen and (max-width: 480px) {
   .player-card {
-    padding: 30px 25px;
+    padding: 24px 20px;
     border-radius: 28px;
+  }
+  .artwork-container {
+    width: 85%;
   }
 }
 

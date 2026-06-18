@@ -170,9 +170,9 @@ function showControls() {
       bottomSection.style.pointerEvents = 'auto';
       if (background) background.classList.add('expanded');
       
-      const shareBtn = document.getElementById("share-btn");
-      if (shareBtn) {
-        shareBtn.classList.add('show');
+      const topNav = document.getElementById("top-nav");
+      if (topNav) {
+        topNav.classList.add('show');
       }
     }, 50);
   }
@@ -549,5 +549,13 @@ if (shareBtn && toast) {
     } else {
       fallbackCopyTextToClipboard(urlToCopy);
     }
+  });
+}
+
+// Home Button Handler
+const homeBtn = document.getElementById("home-btn");
+if (homeBtn) {
+  homeBtn.addEventListener("click", () => {
+    window.location.href = window.location.pathname;
   });
 }
