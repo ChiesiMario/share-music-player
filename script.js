@@ -494,6 +494,7 @@ if (urlPlayBtn) {
     const urlInput = document.getElementById("song-url-input").value.trim();
     if (urlInput) {
       urlPlayBtn.classList.add("active-led");
+      urlPlayBtn.disabled = true;
       setTimeout(() => {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('link', urlInput);
