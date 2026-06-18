@@ -500,8 +500,20 @@ const urlPlayBtn = document.getElementById("song-url-play-btn");
 if (urlPlayBtn) {
   urlPlayBtn.addEventListener("click", () => {
     const urlInput = document.getElementById("song-url-input").value.trim();
-    if (urlInput) {
-      urlPlayBtn.classList.add("active-led", "pressed");
+    
+    if (!urlInput) {
+      showToast("請輸入歌曲的網址！");
+      return;
+    }
+    
+    try {
+      new URL(urlInput);
+    } catch (e) {
+      showToast("無效的網址！請確認包含 http:// 或 https://");
+      return;
+    }
+
+    urlPlayBtn.classList.add("active-led", "pressed");
       urlPlayBtn.disabled = true;
       const span = urlPlayBtn.querySelector('span');
       if (span) {
@@ -512,7 +524,6 @@ if (urlPlayBtn) {
         newUrl.searchParams.set('link', urlInput);
         window.location.href = newUrl.href;
       }, 2000);
-    }
   });
   
   // Add enter key support
@@ -526,19 +537,28 @@ if (urlPlayBtn) {
   }
 }
 
-// Share Button Handler
-const shareBtn = document.getElementById("share-btn");
+// Global Toast Logic
 const toast = document.getElementById("toast");
 let toastTimeout;
 
+function showToast(message) {
+  if (!toast) return;
+  if (typeof message === 'string') {
+    toast.textContent = message;
+  } else {
+    toast.textContent = "已複製網址到剪貼簿！";
+  }
+  toast.classList.add("show");
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+
+// Share Button Handler
+const shareBtn = document.getElementById("share-btn");
+
 if (shareBtn && toast) {
-  const showToast = () => {
-    toast.classList.add("show");
-    if (toastTimeout) clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-      toast.classList.remove("show");
-    }, 3000);
-  };
 
   const fallbackCopyTextToClipboard = (text) => {
     const textArea = document.createElement("textarea");
