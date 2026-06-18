@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=50" />
+  <link rel="stylesheet" href="./style.css?v=54" />
 </head>
 
 <body>
@@ -117,6 +117,7 @@
               <i class="fa-solid fa-lock input-icon"></i>
               <input type="password" id="upload-password-input" class="url-input" placeholder="請輸入伺服器密碼">
             </div>
+
             <p
               style="font-size: 10px; color: rgba(84, 200, 250, 0.7); text-align: left; margin-top: 8px; margin-bottom: 0; font-family: 'Inter', sans-serif;">
               <i class="fa-solid fa-circle-info"></i> 上傳的文件會在 36 小時後刪除
@@ -130,7 +131,8 @@
 
       <div id="url-play-btn-wrapper" style="display: none;">
         <button id="main-action-btn" class="url-play-btn-physical">
-          <span><i class="fa-solid fa-play"></i> 播放</span>
+          <div id="upload-progress-bar"></div>
+          <span style="position: relative; z-index: 1;"><i class="fa-solid fa-play"></i> 播放</span>
         </button>
         <input type="file" id="local-upload-input" accept="audio/*" style="display: none;">
       </div>
@@ -161,7 +163,7 @@
   <div id="toast">已複製音樂連結！</div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
-  <script src="./script.js?v=50"></script>
+  <script src="./script.js?v=54"></script>
 </body>
 
 </html>

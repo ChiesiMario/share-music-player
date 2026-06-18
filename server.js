@@ -11,6 +11,7 @@ const UPLOAD_PASSWORD = 'admin'; // 預設上傳密碼
 
 // Enable CORS
 app.use(cors());
+app.use(express.json());
 
 // Serve the frontend static files
 app.use(express.static(path.join(__dirname)));
@@ -36,6 +37,15 @@ const storage = multer.diskStorage({
 const upload = multer({ 
   storage: storage,
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB file size limit
+});
+
+// Password verification endpoint
+app.post('/verify-password', (req, res) => {
+  if (req.body.password === UPLOAD_PASSWORD) {
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
 });
 
 // Upload API endpoint

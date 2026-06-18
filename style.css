@@ -554,6 +554,20 @@ html {
   animation: fadeIn 0.3s ease;
 }
 
+#upload-progress-bar {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: rgba(84, 200, 250, 0.4);
+  z-index: 0;
+  transition: width 0.1s linear;
+  border-radius: inherit;
+  box-shadow: inset 0 0 10px rgba(84, 200, 250, 0.6);
+}
+
 .local-upload-area {
   width: 100%;
   padding: 10px;
@@ -697,6 +711,29 @@ html {
   background: #00ff44;
   box-shadow: 0 0 10px rgba(0, 255, 68, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.8);
   transition: all 1.5s ease;
+}
+
+@keyframes redBreathing {
+  0% {
+    background: #6a0000;
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    background: #ff0000;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    background: #6a0000;
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(255, 255, 255, 0.7);
+  }
+}
+
+.url-play-btn-physical.uploading-led {
+  pointer-events: none;
+}
+
+.url-play-btn-physical.uploading-led::before {
+  animation: redBreathing 1.5s infinite ease-in-out;
 }
 
 .url-play-btn-physical:hover {

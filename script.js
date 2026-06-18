@@ -669,55 +669,116 @@ if (mainActionBtn && localUploadInput) {
     const passwordInput = document.getElementById('upload-password-input');
     const password = passwordInput ? passwordInput.value : '';
 
-    mainActionBtn.classList.add("active-led", "pressed");
+    mainActionBtn.classList.add("uploading-led", "pressed");
     mainActionBtn.disabled = true;
     const span = mainActionBtn.querySelector('span');
     if (span) {
-      span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中...';
+      span.innerHTML = '<i class="fa-solid fa-shield-halved fa-beat"></i> 驗證密碼中...';
     }
 
-    const formData = new FormData();
-    formData.append('musicFile', file);
-    formData.append('password', password);
+    const progressBar = document.getElementById('upload-progress-bar');
+    if (progressBar) {
+      progressBar.style.display = 'block';
+      progressBar.style.width = '0%';
+    }
 
-    fetch('/upload', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => {
-      if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-      }
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.url) {
-        // Construct the full URL for sharing
-        const serverUrl = new URL(data.url, window.location.origin).href;
-        
-        // Append it to the query string and reload so it's shareable
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('link', serverUrl);
-        newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
-        window.location.href = newUrl.href;
-      }
-    })
-    .catch(error => {
-      console.error('Error uploading file:', error);
-      if (error.message === 'UNAUTHORIZED') {
-        showToast('密碼錯誤，拒絕上傳！');
-      } else {
-        showToast('上傳失敗，請確認伺服器已啟動！');
-      }
-      mainActionBtn.classList.remove("active-led", "pressed");
+    setTimeout(() => {
+      fetch('/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      })
+      .then(res => {
+        if (res.status === 401) throw new Error('UNAUTHORIZED');
+        if (!res.ok) throw new Error('VERIFY_FAILED');
+        return res.json();
+      })
+      .then(() => {
+        if (span) {
+          span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 準備上傳...';
+        }
+
+        const formData = new FormData();
+        formData.append('musicFile', file);
+        formData.append('password', password);
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            if (progressBar) progressBar.style.width = percentComplete + '%';
+            if (span) {
+              span.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中... ${percentComplete}%`;
+            }
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 401) {
+            showToast('密碼錯誤，拒絕上傳！');
+            resetUploadUI();
+          } else if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              if (data.url) {
+                const serverUrl = new URL(data.url, window.location.origin).href;
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('link', serverUrl);
+                newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
+                
+                mainActionBtn.classList.remove("uploading-led");
+                mainActionBtn.classList.add("active-led");
+                if (span) {
+                  span.innerHTML = '<i class="fa-solid fa-check"></i> 上傳完成';
+                }
+                if (progressBar) {
+                  progressBar.style.width = '100%';
+                }
+
+                setTimeout(() => {
+                  window.location.href = newUrl.href;
+                }, 1000);
+              }
+            } catch (e) {
+              console.error('Error parsing response:', e);
+              showToast('上傳失敗，伺服器回應錯誤！');
+              resetUploadUI();
+            }
+          } else {
+            showToast('上傳失敗，請確認伺服器已啟動！');
+            resetUploadUI();
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          console.error('Error uploading file');
+          showToast('上傳失敗，網路連線錯誤！');
+          resetUploadUI();
+        });
+
+        xhr.open('POST', '/upload', true);
+        xhr.send(formData);
+      })
+      .catch(error => {
+        if (error.message === 'UNAUTHORIZED') {
+          showToast('密碼錯誤，拒絕上傳！');
+        } else {
+          console.error(error);
+          showToast('伺服器連線錯誤！');
+        }
+        resetUploadUI();
+      });
+    }, 1000);
+
+    function resetUploadUI() {
+      if (progressBar) progressBar.style.display = 'none';
+      mainActionBtn.classList.remove("uploading-led", "active-led", "pressed");
       mainActionBtn.disabled = false;
       if (span) {
         span.innerHTML = '<i class="fa-solid fa-play"></i> 播放';
       }
-    });
+    }
   }
 
   // Local file input change handler: only update the fake input text
