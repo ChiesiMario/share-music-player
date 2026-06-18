@@ -169,6 +169,11 @@ function showControls() {
       bottomSection.style.opacity = '1';
       bottomSection.style.pointerEvents = 'auto';
       if (background) background.classList.add('expanded');
+      
+      const shareBtn = document.getElementById("share-btn");
+      if (shareBtn) {
+        shareBtn.classList.add('show');
+      }
     }, 50);
   }
 }
@@ -499,4 +504,50 @@ if (urlPlayBtn) {
       }
     });
   }
+}
+
+// Share Button Handler
+const shareBtn = document.getElementById("share-btn");
+const toast = document.getElementById("toast");
+let toastTimeout;
+
+if (shareBtn && toast) {
+  const showToast = () => {
+    toast.classList.add("show");
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3000);
+  };
+
+  const fallbackCopyTextToClipboard = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      if (document.execCommand('copy')) showToast();
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+    document.body.removeChild(textArea);
+  };
+
+  shareBtn.addEventListener("click", () => {
+    const urlToCopy = window.location.href;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(urlToCopy)
+        .then(showToast)
+        .catch((err) => {
+          console.warn('Clipboard API failed, using fallback: ', err);
+          fallbackCopyTextToClipboard(urlToCopy);
+        });
+    } else {
+      fallbackCopyTextToClipboard(urlToCopy);
+    }
+  });
 }
