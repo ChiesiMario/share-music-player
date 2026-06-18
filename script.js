@@ -20,7 +20,7 @@ const durationEle = document.getElementById("duration");
 
 const playBtn = document.getElementById("play");
 
-  // Audio Analyzer setup
+// Audio Analyzer setup
 let audioCtx;
 let analyserNode;
 let mediaSourceNode;
@@ -30,25 +30,25 @@ let animationFrameId;
 
 function setupAudioAnalyzer() {
   if (isAnalyzerSetup) return;
-  
+
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
-  
+
   try {
     mediaSourceNode = audioCtx.createMediaElementSource(music);
     analyserNode = audioCtx.createAnalyser();
     analyserNode.fftSize = 128; // 64 frequency bins
-    
+
     mediaSourceNode.connect(analyserNode);
     analyserNode.connect(audioCtx.destination);
-    
+
     const bufferLength = analyserNode.frequencyBinCount;
     visualizerDataArray = new Uint8Array(bufferLength);
-    
+
     isAnalyzerSetup = true;
   } catch (err) {
     console.warn("Could not setup audio analyzer:", err);
@@ -59,16 +59,16 @@ function setupAudioAnalyzer() {
 
 function updateVisualizer() {
   if (!isPlaying) return;
-  
+
   const bars = document.querySelectorAll(".lcd-bar");
   if (bars.length > 0) {
     let useFake = true;
-    
+
     if (isAnalyzerSetup && analyserNode) {
       useFake = false; // Always trust the analyzer if it's setup (even for silence)
       analyserNode.getByteFrequencyData(visualizerDataArray);
     }
-    
+
     bars.forEach((bar, index) => {
       let val = 0;
       if (useFake) {
@@ -83,7 +83,7 @@ function updateVisualizer() {
       bar.style.transform = `scaleY(${scale})`;
     });
   }
-  
+
   // Throttle animation to make it look like a chunky LCD screen update (~15fps)
   setTimeout(() => {
     animationFrameId = requestAnimationFrame(updateVisualizer);
@@ -137,7 +137,7 @@ function playSong() {
   playBtn.classList.replace("fa-play", "fa-pause");
   playBtn.setAttribute("title", "Pause");
   controls.classList.add("playing");
-  
+
   clearTimeout(playTimeout);
   playTimeout = setTimeout(() => {
     if (isPlaying) {
@@ -157,11 +157,11 @@ function pauseSong() {
   playBtn.classList.replace("fa-pause", "fa-play");
   playBtn.setAttribute("title", "Play");
   controls.classList.remove("playing");
-  
+
   const lcdEq = document.getElementById("lcd-eq");
   if (lcdEq) lcdEq.classList.remove("playing");
   cancelAnimationFrame(animationFrameId);
-  
+
   clearTimeout(playTimeout);
   music.pause();
 }
@@ -261,7 +261,7 @@ function showControls() {
       bottomSection.style.opacity = '1';
       bottomSection.style.pointerEvents = 'auto';
       if (background) background.classList.add('expanded');
-      
+
       const topNav = document.getElementById("top-nav");
       if (topNav) {
         topNav.classList.add('show');
@@ -331,7 +331,7 @@ if (songs[0].mp3link) {
     let downloadedBytes = 0;
     let totalBytes = 0;
     let retries = 0;
-    
+
     while (retries <= maxRetries) {
       try {
         const headers = {};
@@ -339,59 +339,59 @@ if (songs[0].mp3link) {
           headers['Range'] = `bytes=${downloadedBytes}-`;
           title.textContent = `網路不穩，重新連線中...`;
         }
-        
+
         const response = await fetch(url, { headers });
-        
+
         if (!response.ok && response.status !== 206 && response.status !== 416) {
-           throw new Error(`HTTP Error: ${response.status}`);
+          throw new Error(`HTTP Error: ${response.status}`);
         }
-        
+
         if (response.status === 416) {
-           // Range not satisfiable, meaning we probably downloaded everything already
-           return new Blob(chunks);
+          // Range not satisfiable, meaning we probably downloaded everything already
+          return new Blob(chunks);
         }
-        
+
         if (totalBytes === 0) {
           const contentRange = response.headers.get('content-range');
           if (contentRange) {
-             totalBytes = parseInt(contentRange.split('/')[1], 10);
+            totalBytes = parseInt(contentRange.split('/')[1], 10);
           } else {
-             const contentLength = response.headers.get('content-length');
-             totalBytes = contentLength ? parseInt(contentLength, 10) + downloadedBytes : 0;
+            const contentLength = response.headers.get('content-length');
+            totalBytes = contentLength ? parseInt(contentLength, 10) + downloadedBytes : 0;
           }
         }
-        
+
         // If server doesn't support range requests and it's a retry, we must restart
         if (retries > 0 && response.status === 200 && downloadedBytes > 0) {
-           console.warn("Server doesn't support Range requests. Restarting download.");
-           chunks = [];
-           downloadedBytes = 0;
+          console.warn("Server doesn't support Range requests. Restarting download.");
+          chunks = [];
+          downloadedBytes = 0;
         }
-  
+
         const reader = response.body.getReader();
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          
+
           if (title.textContent.includes('網路不穩')) {
             title.textContent = '歌曲加載中 ……'; // restore text on success
           }
           chunks.push(value);
           downloadedBytes += value.length;
-          
+
           if (totalBytes && fetchProgressBar) {
-             const percent = (downloadedBytes / totalBytes) * 100;
-             fetchProgressBar.style.width = `${percent}%`;
+            const percent = (downloadedBytes / totalBytes) * 100;
+            fetchProgressBar.style.width = `${percent}%`;
           }
         }
-        
+
         return new Blob(chunks);
-        
+
       } catch (error) {
         retries++;
         console.warn(`Download interrupted. Retrying (${retries}/${maxRetries})...`, error);
         if (retries > maxRetries) throw error;
-        
+
         title.textContent = `網路不穩，等待重連 (${retries}/${maxRetries})...`;
         await new Promise(r => setTimeout(r, 1000 * retries)); // Exponential backoff
       }
@@ -414,16 +414,16 @@ if (songs[0].mp3link) {
     } catch (error) {
       console.log('Range request failed, falling back to robust fetch...', error);
     }
-    
+
     // 2. Fallback to robust resumable download
     if (fetchProgressContainer) {
       fetchProgressContainer.style.display = 'block';
       title.textContent = '歌曲加載中 ……';
     }
-    
+
     const cacheBusterUrl = songs[0].mp3link + (songs[0].mp3link.includes('?') ? '&' : '?') + 'cors=' + Date.now();
     let blob = null;
-    
+
     try {
       blob = await fetchWithResume(cacheBusterUrl, 3); // 3 retries
     } catch (err) {
@@ -432,10 +432,10 @@ if (songs[0].mp3link) {
       processError(err);
       return;
     }
-    
+
     // 3. Retry parsing on the downloaded blob
     title.textContent = '歌曲信息解析中 ……';
-    
+
     let parsed = false;
     for (let parseAttempt = 1; parseAttempt <= 2; parseAttempt++) {
       try {
@@ -582,12 +582,12 @@ const urlPlayBtn = document.getElementById("song-url-play-btn");
 if (urlPlayBtn) {
   urlPlayBtn.addEventListener("click", () => {
     const urlInput = document.getElementById("song-url-input").value.trim();
-    
+
     if (!urlInput) {
       showToast("請輸入歌曲的網址！");
       return;
     }
-    
+
     try {
       new URL(urlInput);
     } catch (e) {
@@ -596,18 +596,18 @@ if (urlPlayBtn) {
     }
 
     urlPlayBtn.classList.add("active-led", "pressed");
-      urlPlayBtn.disabled = true;
-      const span = urlPlayBtn.querySelector('span');
-      if (span) {
-        span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
-      }
-      setTimeout(() => {
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('link', urlInput);
-        window.location.href = newUrl.href;
-      }, 2000);
+    urlPlayBtn.disabled = true;
+    const span = urlPlayBtn.querySelector('span');
+    if (span) {
+      span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
+    }
+    setTimeout(() => {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('link', urlInput);
+      window.location.href = newUrl.href;
+    }, 2000);
   });
-  
+
   // Add enter key support
   const urlInputEl = document.getElementById("song-url-input");
   if (urlInputEl) {
@@ -691,9 +691,9 @@ function playClickSound() {
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
-  
+
   const t = audioCtx.currentTime;
-  
+
   // 1. High frequency noise burst for the mechanical "click" contact
   const bufferSize = audioCtx.sampleRate * 0.02; // 20ms of noise
   const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -701,37 +701,37 @@ function playClickSound() {
   for (let i = 0; i < bufferSize; i++) {
     data[i] = Math.random() * 2 - 1;
   }
-  
+
   const noiseSource = audioCtx.createBufferSource();
   noiseSource.buffer = buffer;
-  
+
   const noiseFilter = audioCtx.createBiquadFilter();
   noiseFilter.type = 'bandpass';
   noiseFilter.frequency.value = 5000;
   noiseFilter.Q.value = 1;
-  
+
   const noiseGain = audioCtx.createGain();
   noiseGain.gain.setValueAtTime(1.5, t);
   noiseGain.gain.setTargetAtTime(0, t, 0.005); // extremely rapid decay
-  
+
   noiseSource.connect(noiseFilter);
   noiseFilter.connect(noiseGain);
   noiseGain.connect(audioCtx.destination);
   noiseSource.start(t);
-  
+
   // 2. Low frequency thud for the plastic/metal body resonance
   const osc = audioCtx.createOscillator();
   const oscGain = audioCtx.createGain();
   osc.type = 'square';
   osc.frequency.setValueAtTime(80, t); // constant low pitch
-  
+
   oscGain.gain.setValueAtTime(0.4, t);
   oscGain.gain.setTargetAtTime(0, t, 0.01); // fast decay
-  
+
   const oscFilter = audioCtx.createBiquadFilter();
   oscFilter.type = 'lowpass';
   oscFilter.frequency.value = 600;
-  
+
   osc.connect(oscFilter);
   oscFilter.connect(oscGain);
   oscGain.connect(audioCtx.destination);
@@ -746,3 +746,43 @@ document.addEventListener('mousedown', (e) => {
     playClickSound();
   }
 });
+
+// --- Volume Control ---
+const volumeSlider = document.getElementById('volume-slider');
+
+if (volumeSlider) {
+  music.volume = volumeSlider.value;
+
+  volumeSlider.addEventListener('input', (e) => {
+    music.volume = e.target.value;
+
+    // Play a lighter click sound for the slider detents
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    const oscFilter = audioCtx.createBiquadFilter();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(800, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t + 0.02);
+
+    oscFilter.type = 'bandpass';
+    oscFilter.frequency.value = 1500;
+
+    oscGain.gain.setValueAtTime(0.3, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
+
+    osc.connect(oscFilter);
+    oscFilter.connect(oscGain);
+    oscGain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.03);
+  });
+}

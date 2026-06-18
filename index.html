@@ -1,140 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta property="og:title" content="Music Player" />
-    <meta property="og:type" content="website" />
-    <title>Music Share</title>
-    
-    <link rel="icon" type="image/png" href="./img/logo.png" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css?v=13" />
-  </head>
-  <body>
-    <div class="player-wrapper">
-      <!-- Dynamic Blurred Background -->
-      <div class="bg-blur-container">
-        <div class="bg-blur" id="background"></div>
-      </div>
-      
-      <!-- Main Player Card -->
-      <div class="player-card">
-        
-        <div class="top-nav" id="top-nav">
-          <button id="home-btn" class="nav-btn" title="回首頁 (輸入新的網址)">
-            <i class="fa-solid fa-house"></i>
-          </button>
-          <button id="share-btn" class="nav-btn" title="複製連結分享">
-            <i class="fa-solid fa-share-nodes"></i>
-          </button>
-        </div>
-        
-        <div class="artwork-container">
-          <div class="default-cover" id="default-cover">
-            <div class="share-card-modern">
-              <div class="eq-bars">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-              </div>
-              <div class="share-text-modern">
-                <span class="share-highlight">Music Share</span>
-                <span class="share-label">音 樂 分 享</span>
-              </div>
-            </div>
-          </div>
-          <img id="cover" src="" alt="Cover Art" style="display: none;" />
-          
-        </div>
-        
-        <div class="track-info">
-          <div class="lcd-eq" id="lcd-eq">
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-<div class="lcd-bar"></div>
-</div>
-          <h1 id="title">&nbsp;</h1>
-          <div id="fetch-progress-container" class="fetch-progress">
-            <div id="fetch-progress-bar"></div>
-          </div>
-          
-          <div id="url-input-container" class="url-input-container" style="display: none;">
-            <div class="input-wrapper">
-              <i class="fa-solid fa-link input-icon"></i>
-              <input type="text" id="song-url-input" class="url-input" placeholder="輸入 MP3 網址 (https://...)">
-            </div>
-          </div>
-          <h2 id="artist"><a id="artist-link" href="#" target="_blank">&nbsp;</a></h2>
-          <h3 id="album"><a id="album-link" href="#" target="_blank">&nbsp;</a></h3>
-          <h4 id="year">&nbsp;</h4>
-        </div>
 
-        <div id="url-play-btn-wrapper" style="display: none;">
-          <button id="song-url-play-btn" class="url-play-btn-physical">
-            <span><i class="fa-solid fa-play"></i> 播放</span>
-          </button>
-        </div>
-        
-        <div id="bottom-section" style="display: grid; grid-template-rows: 0fr; opacity: 0; pointer-events: none; transition: grid-template-rows 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease; width: 100%;">
-          <div style="overflow: hidden; min-height: 0;">
-            <div class="progress-area" id="progress-area">
-              <div class="progress-bar-bg" id="progress-container">
-                <div class="progress-fill" id="progress"></div>
-              </div>
-              <div class="time-labels">
-                <span id="current-time">0:00</span>
-                <span id="duration">-:-</span>
-              </div>
-            </div>
-            
-            <div class="controls" id="controls">
-              <i class="fa-solid fa-play btn-play" id="play" title="Play"></i>
-            </div>
-          </div>
-        </div>
-        
-        <audio id="audio" crossorigin="anonymous" src=""></audio>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Music Player" />
+  <meta property="og:type" content="website" />
+  <title>Music Share</title>
+
+  <link rel="icon" type="image/png" href="./img/logo.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./style.css?v=19" />
+</head>
+
+<body>
+  <div class="player-wrapper">
+    <!-- Dynamic Blurred Background -->
+    <div class="bg-blur-container">
+      <div class="bg-blur" id="background"></div>
     </div>
-    
-    <div id="toast">已複製音樂連結！</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
-    <script src="./script.js?v=14"></script>
-  </body>
+    <!-- Main Player Card -->
+    <div class="player-card">
+
+      <div class="top-nav" id="top-nav">
+        <button id="home-btn" class="nav-btn" title="回首頁 (輸入新的網址)">
+          <i class="fa-solid fa-house"></i>
+        </button>
+        <button id="share-btn" class="nav-btn" title="複製連結分享">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </div>
+
+      <div class="artwork-container">
+        <div class="default-cover" id="default-cover">
+          <div class="share-card-modern">
+            <div class="eq-bars">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+            <div class="share-text-modern">
+              <span class="share-highlight">Music Share</span>
+              <span class="share-label">音 樂 分 享</span>
+            </div>
+          </div>
+        </div>
+        <img id="cover" src="" alt="Cover Art" style="display: none;" />
+
+      </div>
+
+      <div class="track-info">
+        <div class="lcd-eq" id="lcd-eq">
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+          <div class="lcd-bar"></div>
+        </div>
+        <h1 id="title">&nbsp;</h1>
+        <div id="fetch-progress-container" class="fetch-progress">
+          <div id="fetch-progress-bar"></div>
+        </div>
+
+        <div id="url-input-container" class="url-input-container" style="display: none;">
+          <div class="input-wrapper">
+            <i class="fa-solid fa-link input-icon"></i>
+            <input type="text" id="song-url-input" class="url-input" placeholder="輸入 MP3 網址 (https://...)">
+          </div>
+        </div>
+        <h2 id="artist"><a id="artist-link" href="#" target="_blank">&nbsp;</a></h2>
+        <h3 id="album"><a id="album-link" href="#" target="_blank">&nbsp;</a></h3>
+        <h4 id="year">&nbsp;</h4>
+      </div>
+
+      <div id="url-play-btn-wrapper" style="display: none;">
+        <button id="song-url-play-btn" class="url-play-btn-physical">
+          <span><i class="fa-solid fa-play"></i> 播放</span>
+        </button>
+      </div>
+
+      <div id="bottom-section"
+        style="display: grid; grid-template-rows: 0fr; opacity: 0; pointer-events: none; transition: grid-template-rows 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease; width: 100%;">
+        <div style="overflow: hidden; min-height: 0;">
+          <div class="progress-area" id="progress-area">
+            <div class="progress-bar-bg" id="progress-container">
+              <div class="progress-fill" id="progress"></div>
+            </div>
+            <div class="time-labels">
+              <span id="current-time">0:00</span>
+              <span id="duration">-:-</span>
+            </div>
+          </div>
+
+          <div class="controls" id="controls">
+            <i class="fa-solid fa-play btn-play" id="play" title="Play"></i>
+          </div>
+        </div>
+      </div>
+
+      <audio id="audio" crossorigin="anonymous" src=""></audio>
+    </div>
+  </div>
+
+  <div id="toast">已複製音樂連結！</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+  <script src="./script.js?v=14"></script>
+</body>
+
 </html>
