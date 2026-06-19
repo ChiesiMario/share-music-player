@@ -250,7 +250,51 @@ function loadSong(song) {
     music.src = `${song.mp3link}`;
   }
 
+  // Dynamic Theme Extraction
+  function extractDominantColor(imgEl) {
+    if (!imgEl || !imgEl.complete || !imgEl.naturalWidth) return '84, 200, 250';
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 50; canvas.height = 50;
+      ctx.drawImage(imgEl, 0, 0, 50, 50);
+      const data = ctx.getImageData(0, 0, 50, 50).data;
+      
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let i = 0; i < data.length; i += 16) {
+        if (data[i+3] < 128) continue;
+        const brightness = (data[i] + data[i+1] + data[i+2]) / 3;
+        if (brightness < 20 || brightness > 240) continue;
+        r += data[i]; g += data[i+1]; b += data[i+2]; count++;
+      }
+      
+      if (count === 0) return '84, 200, 250';
+      r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
+      
+      const max = Math.max(r, g, b);
+      if (max > 0 && max < 255) {
+        const boost = 255 / max;
+        r = Math.min(255, Math.floor(r * (1 + (boost - 1) * 0.6)));
+        g = Math.min(255, Math.floor(g * (1 + (boost - 1) * 0.6)));
+        b = Math.min(255, Math.floor(b * (1 + (boost - 1) * 0.6)));
+      }
+      return `${r}, ${g}, ${b}`;
+    } catch (e) {
+      return '84, 200, 250';
+    }
+  }
+
+  // Clear previous onload
+  image.onload = null;
+
   if (song.cover && song.cover !== './img/logo.png') {
+    image.crossOrigin = "Anonymous"; // Ensure we can read pixels if possible
+    image.onload = () => {
+      const rgbStr = extractDominantColor(image);
+      document.documentElement.style.setProperty('--theme-color-rgb', rgbStr);
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', `rgb(${rgbStr})`);
+    };
     image.src = `${song.cover}`;
     image.style.display = 'block';
     
@@ -261,6 +305,11 @@ function loadSong(song) {
     document.querySelector('.artwork-container').classList.add('has-cover');
     if (background) background.style.backgroundImage = `url(${song.cover})`;
   } else {
+    // Reset to default theme
+    document.documentElement.style.setProperty('--theme-color-rgb', '84, 200, 250');
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', '#2b3138');
+    
     artistLink.style.pointerEvents = 'none';
   }
 
