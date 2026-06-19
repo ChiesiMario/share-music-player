@@ -10,6 +10,12 @@ const app = express();
 const port = 8000;
 const UPLOAD_PASSWORD = 'admin'; // 預設上傳密碼
 
+// Initialize cache directory
+const CACHE_DIR = path.join(__dirname, '.cache');
+if (!fs.existsSync(CACHE_DIR)) {
+  fs.mkdirSync(CACHE_DIR);
+}
+
 // Enable CORS with exposed headers for Range requests
 app.use(cors({
   exposedHeaders: ['Content-Length', 'Content-Range', 'Accept-Ranges']
@@ -154,6 +160,16 @@ app.get('/metadata', async (req, res) => {
   if (!fileUrl) return res.status(400).json({ error: 'Missing url parameter' });
 
   try {
+    const urlHash = crypto.createHash('md5').update(fileUrl).digest('hex');
+    const cacheFile = path.join(CACHE_DIR, `${urlHash}.json`);
+    
+    if (fs.existsSync(cacheFile)) {
+      console.log(`Cache hit: reading from local cache for ${fileUrl}`);
+      const cachedData = fs.readFileSync(cacheFile, 'utf-8');
+      return res.json(JSON.parse(cachedData));
+    }
+
+    console.log(`Cache miss: fetching from remote for ${fileUrl}`);
     let metadata;
     if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
       const https = fileUrl.startsWith('https') ? require('https') : require('http');
@@ -192,6 +208,7 @@ app.get('/metadata', async (req, res) => {
       meta.coverData = `data:${pic.format};base64,${Buffer.from(pic.data).toString('base64')}`;
     }
 
+    fs.writeFileSync(cacheFile, JSON.stringify(meta), 'utf-8');
     res.json(meta);
   } catch (err) {
     console.error('Error in /metadata endpoint:', err);
