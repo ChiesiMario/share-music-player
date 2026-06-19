@@ -437,6 +437,14 @@ html {
   transition: transform 0.05s ease-out;
 }
 
+.title-wrapper {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  margin-top: 2px;
+  margin-bottom: 5px;
+}
+
 .track-info h1 {
   color: #54c8fa;
   font-family: "DotGothic16", "Courier New", Courier, monospace;
@@ -447,16 +455,27 @@ html {
   padding: 10px 4px;
   margin-top: -10px;
   margin-bottom: -6px;
-  /* original was 4px, so -10 + 4 = -6 */
   margin-left: -4px;
   margin-right: -4px;
 
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   text-shadow: 0 0 4px rgba(84, 200, 250, 0.5), 0 0 1px rgba(255, 255, 255, 0.2);
   /* Lighter glow */
   text-transform: uppercase;
+  display: inline-block;
+  min-width: 100%;
+  text-align: center;
+  will-change: transform;
+}
+
+.track-info h1.marquee {
+  animation: scrollText 6s linear infinite alternate;
+  text-align: left;
+}
+
+@keyframes scrollText {
+  0%, 15% { transform: translateX(0); }
+  85%, 100% { transform: translateX(var(--scroll-dist)); }
 }
 
 .loading-text {

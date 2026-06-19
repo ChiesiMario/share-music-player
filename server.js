@@ -154,14 +154,31 @@ app.get('/metadata', async (req, res) => {
   if (!fileUrl) return res.status(400).json({ error: 'Missing url parameter' });
 
   try {
-    const urlObj = new URL(fileUrl, `http://localhost:${port}`);
-    const filePath = path.join(__dirname, decodeURIComponent(urlObj.pathname));
+    let metadata;
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      const https = fileUrl.startsWith('https') ? require('https') : require('http');
+      metadata = await new Promise((resolve, reject) => {
+        https.get(fileUrl, async (response) => {
+          if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+            // Very basic redirect handling
+            https.get(response.headers.location, async (res2) => {
+              try { resolve(await mm.parseStream(res2, res2.headers['content-type'])); } catch (e) { reject(e); }
+            }).on('error', reject);
+          } else {
+            try { resolve(await mm.parseStream(response, response.headers['content-type'])); } catch (e) { reject(e); }
+          }
+        }).on('error', reject);
+      });
+    } else {
+      const urlObj = new URL(fileUrl, `http://localhost:${port}`);
+      const filePath = path.join(__dirname, decodeURIComponent(urlObj.pathname));
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'File not found on server' });
+      if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+        return res.status(404).json({ error: 'File not found or is a directory' });
+      }
+      metadata = await mm.parseFile(filePath);
     }
-
-    const metadata = await mm.parseFile(filePath);
+    
     const common = metadata.common;
     const meta = {
       title: common.title,

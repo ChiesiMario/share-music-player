@@ -187,6 +187,27 @@ function loadSong(song) {
   title.classList.remove('loading-text');
   title.textContent = song.displayName;
 
+  // reset animation
+  title.style.animation = 'none';
+  title.style.transform = 'translateX(0)';
+  
+  // wait for DOM to render the new text to get accurate widths
+  setTimeout(() => {
+    const wrapper = document.getElementById('title-wrapper');
+    if (wrapper && title.scrollWidth > wrapper.clientWidth) {
+      // scroll width is the text length, plus 15px extra buffer
+      const distance = title.scrollWidth - wrapper.clientWidth + 15;
+      title.style.setProperty('--scroll-dist', `-${distance}px`);
+      // force reflow
+      void title.offsetWidth;
+      title.style.animation = ''; // restore animation
+      title.classList.add('marquee');
+    } else {
+      title.style.animation = '';
+      title.classList.remove('marquee');
+    }
+  }, 50);
+
   if (artistLink) {
     artistLink.textContent = song.artist || "";
     if (song.displayName === '未找到歌曲') {
@@ -450,29 +471,26 @@ if (songs[0].mp3link) {
   }
 
   const loadAndParseMetadata = async () => {
-    // 1a. Try fetching metadata from our own server API (fastest and most reliable for uploaded files)
-    const isLocalServer = songs[0].mp3link.includes(window.location.origin) || songs[0].mp3link.startsWith('./uploads');
-    if (isLocalServer) {
-      try {
-        const response = await fetch(`/metadata?url=${encodeURIComponent(songs[0].mp3link)}`);
-        if (response.ok) {
-          const common = await response.json();
-          if (common && common.title) {
-            songs[0].displayName = common.title || (songs[0].displayName === '' ? '未找到歌曲' : songs[0].displayName);
-            songs[0].artist = common.artist || (songs[0].artist === '' ? '未知歌手' : songs[0].artist);
-            songs[0].album = common.album || '';
-            songs[0].year = common.year || common.date || common.originalyear || '';
+    // 1a. Try fetching metadata from our own server API (fastest and most reliable for all files now!)
+    try {
+      const response = await fetch(`/metadata?url=${encodeURIComponent(songs[0].mp3link)}`);
+      if (response.ok) {
+        const common = await response.json();
+        if (common && common.title) {
+          songs[0].displayName = common.title || (songs[0].displayName === '' ? '未找到歌曲' : songs[0].displayName);
+          songs[0].artist = common.artist || (songs[0].artist === '' ? '未知歌手' : songs[0].artist);
+          songs[0].album = common.album || '';
+          songs[0].year = common.year || '';
 
-            if (common.coverData) {
-              songs[0].cover = common.coverData;
-            }
-            if (songIndex === 0) { showControls(); loadSong(songs[0]); }
-            return; // Success!
+          if (common.coverData) {
+            songs[0].cover = common.coverData;
           }
+          if (songIndex === 0) { showControls(); loadSong(songs[0]); }
+          return; // Success!
         }
-      } catch (err) {
-        console.log('Server metadata API failed, falling back...', err);
       }
+    } catch (err) {
+      console.log('Server /metadata fetch failed:', err);
     }
 
     // 1b. Try music-metadata-browser using Range requests (superior for FLAC, etc.)
