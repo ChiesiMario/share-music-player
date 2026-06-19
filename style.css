@@ -832,18 +832,38 @@ html {
 
 .retro-loading-container {
   width: 70%;
-  background-color: #000;
-  padding: 10px 0;
-  display: none;
-  margin: 15px auto 0 auto;
+  background-color: transparent;
+  margin: 0 auto 0 auto;
   box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: opacity 0.4s ease, margin-top 0.4s ease, grid-template-rows 0.4s ease;
+  overflow: hidden;
+}
+
+.retro-loading-container.active {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 15px;
+  overflow: visible;
+}
+
+.retro-loading-content {
+  min-height: 0;
+  padding: 0;
+  transition: padding 0.4s ease;
+}
+
+.retro-loading-container.active .retro-loading-content {
+  padding: 10px 0;
 }
 
 .retro-loading-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
-  color: #fff;
+  color: #54c8fa;
   font-family: "DotGothic16", "Courier New", Courier, monospace;
   font-weight: bold;
   font-size: 13px; /* Slightly adjusted to accommodate pixel font readability */
@@ -853,10 +873,10 @@ html {
 .retro-loading-track {
   width: 100%;
   height: 18px;
-  border: 2px solid #fff;
+  border: 2px solid #54c8fa;
   padding: 2px;
   box-sizing: border-box;
-  background-color: #000;
+  background-color: transparent;
   position: relative;
 }
 
@@ -871,8 +891,8 @@ html {
     to right,
     transparent 0%,
     transparent 80%,
-    #000 80%,
-    #000 100%
+    #0f1614 80%,
+    #0f1614 100%
   );
   background-size: 5% 100%; /* Exactly 20 segments */
   pointer-events: none;
@@ -882,7 +902,7 @@ html {
 .retro-loading-bar {
   height: 100%;
   width: 0%;
-  background-color: #fff;
+  background-color: #54c8fa;
   transition: width 0.1s linear, background-color 0.2s linear, box-shadow 0.2s linear;
 }
 

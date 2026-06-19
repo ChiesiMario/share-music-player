@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50MB file size limit
+  limits: { fileSize: 200 * 1024 * 1024 } // 200MB file size limit
 });
 
 // Password verification endpoint
@@ -45,6 +45,32 @@ app.post('/verify-password', (req, res) => {
     res.json({ success: true });
   } else {
     res.status(401).json({ error: 'Unauthorized' });
+  }
+});
+
+// Check file existence API endpoint for instant upload
+app.post('/check-file', (req, res) => {
+  const { md5, ext, password } = req.body;
+  
+  if (password !== UPLOAD_PASSWORD) {
+    return res.status(401).json({ error: 'Unauthorized: Incorrect password' });
+  }
+
+  if (!md5 || !ext) {
+    return res.status(400).json({ error: 'Missing md5 or ext' });
+  }
+
+  const newFilename = md5 + ext;
+  const finalPath = path.join(uploadDir, newFilename);
+
+  if (fs.existsSync(finalPath)) {
+    // File already exists, update mtime to reset the 36-hour timer
+    const now = new Date();
+    fs.utimesSync(finalPath, now, now);
+    const fileUrl = `./uploads/${newFilename}`;
+    return res.json({ exists: true, url: fileUrl });
+  } else {
+    return res.json({ exists: false });
   }
 });
 

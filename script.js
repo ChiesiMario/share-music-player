@@ -698,98 +698,160 @@ if (mainActionBtn && localUploadInput) {
       })
       .then(() => {
         // 驗證成功：顯示進度條、點亮紅色呼吸燈，開始上傳
-          if (progressContainer) {
-            progressContainer.style.display = 'block';
-          }if (progressBar) progressBar.style.width = '0%';
-        if (progressText) progressText.textContent = '0%';
+        if (progressContainer) {
+          progressContainer.classList.add('active');
+        }
+        if (progressBar) progressBar.style.width = '0%';
+        if (progressText) progressText.textContent = '分析中...';
 
         mainActionBtn.classList.add("uploading-led");
         if (span) {
           span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中...';
         }
 
-        const formData = new FormData();
-        formData.append('musicFile', file);
-        formData.append('password', password);
+        const ext = file.name.substring(file.name.lastIndexOf('.'));
+        
+        function calculateMD5(file) {
+          return new Promise((resolve, reject) => {
+            const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+            const chunkSize = 2097152;
+            const chunks = Math.ceil(file.size / chunkSize);
+            let currentChunk = 0;
+            const spark = new SparkMD5.ArrayBuffer();
+            const fileReader = new FileReader();
+            fileReader.onload = e => {
+              spark.append(e.target.result);
+              currentChunk++;
+              if (currentChunk < chunks) loadNext();
+              else resolve(spark.end());
+            };
+            fileReader.onerror = () => reject('Error reading file');
+            function loadNext() {
+              const start = currentChunk * chunkSize;
+              const end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+              fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+            }
+            loadNext();
+          });
+        }
 
-        const xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            const percentComplete = Math.round((e.loaded / e.total) * 100);
+        return calculateMD5(file).then(md5Hex => {
+          return fetch('/check-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ md5: md5Hex, ext: ext, password })
+          });
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('CHECK_FAILED');
+          return res.json();
+        })
+        .then(data => {
+          if (data.exists) {
+            // 秒傳成功
+            mainActionBtn.classList.remove("uploading-led");
+            mainActionBtn.classList.add("active-led");
+            if (span) {
+              span.innerHTML = '<i class="fa-solid fa-bolt"></i> 秒傳成功';
+            }
             if (progressBar) {
-              progressBar.style.width = percentComplete + '%';
-              
-              if (percentComplete < 50) {
-                progressBar.style.backgroundColor = '#fff';
-                progressBar.style.boxShadow = 'none';
-                progressBar.classList.remove('flash-effect');
-              } else {
-                const ratio = (percentComplete - 50) / 50; // 0 to 1
-                const r = Math.round(255 + (0 - 255) * ratio);
-                const g = Math.round(255 + (229 - 255) * ratio);
-                const b = 255;
-                const hexColor = `rgb(${r}, ${g}, ${b})`;
-                progressBar.style.backgroundColor = hexColor;
-                progressBar.style.boxShadow = `0 0 ${10 * ratio}px ${hexColor}, 0 0 ${20 * ratio}px ${hexColor}`;
-                
-                if (percentComplete >= 85) {
-                  progressBar.classList.add('flash-effect');
-                } else {
-                  progressBar.classList.remove('flash-effect');
-                }
-              }
+              progressBar.style.width = '100%';
+              progressBar.style.backgroundColor = '#54c8fa';
+              progressBar.style.boxShadow = '0 0 20px #54c8fa, 0 0 40px #54c8fa, 0 0 80px #54c8fa';
+              progressBar.classList.add('flash-effect');
             }
-            if (progressText) progressText.textContent = percentComplete + '%';
-          }
-        });
+            if (progressText) progressText.textContent = '100%';
 
-        xhr.addEventListener('load', () => {
-          if (xhr.status === 401) {
-            showToast('密碼錯誤，拒絕上傳！');
-            resetUploadUI();
-          } else if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const data = JSON.parse(xhr.responseText);
-              if (data.url) {
-                const serverUrl = new URL(data.url, window.location.origin).href;
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.set('link', serverUrl);
-                newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
-                
-                // 上傳完成：切換為綠色 LED
-                mainActionBtn.classList.remove("uploading-led");
-                mainActionBtn.classList.add("active-led");
-                if (span) {
-                  span.innerHTML = '<i class="fa-solid fa-check"></i> 上傳完成';
-                }
-                if (progressBar) progressBar.style.width = '100%';
-                if (progressText) progressText.textContent = '100%';
-
-                // 等待 2s 後進入播放
-                setTimeout(() => {
-                  window.location.href = newUrl.href;
-                }, 2000);
-              }
-            } catch (e) {
-              console.error('Error parsing response:', e);
-              showToast('上傳失敗，伺服器回應錯誤！');
-              resetUploadUI();
-            }
+            const serverUrl = new URL(data.url, window.location.origin).href;
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('link', serverUrl);
+            newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
+            
+            setTimeout(() => {
+              window.location.href = newUrl.href;
+            }, 2000);
           } else {
-            showToast('上傳失敗，請確認伺服器已啟動！');
-            resetUploadUI();
+            if (progressText) progressText.textContent = '0%';
+            
+            const formData = new FormData();
+            formData.append('musicFile', file);
+            formData.append('password', password);
+
+            const xhr = new XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', (e) => {
+              if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                if (progressBar) {
+                  progressBar.style.width = percentComplete + '%';
+                  
+                  if (percentComplete < 50) {
+                    progressBar.style.backgroundColor = '#54c8fa';
+                    progressBar.style.boxShadow = 'none';
+                    progressBar.classList.remove('flash-effect');
+                  } else {
+                    const ratio = (percentComplete - 50) / 50; // 0 to 1
+                    progressBar.style.backgroundColor = '#54c8fa';
+                    const glow1 = 8 + 12 * ratio;
+                    const glow2 = 0 + 40 * ratio;
+                    const glow3 = 0 + 80 * ratio;
+                    progressBar.style.boxShadow = `0 0 ${glow1}px #54c8fa, 0 0 ${glow2}px #54c8fa, 0 0 ${glow3}px #54c8fa`;
+                    
+                    progressBar.classList.add('flash-effect');
+                  }
+                }
+                if (progressText) progressText.textContent = percentComplete + '%';
+              }
+            });
+
+            xhr.addEventListener('load', () => {
+              if (xhr.status === 401) {
+                showToast('密碼錯誤，拒絕上傳！');
+                resetUploadUI();
+              } else if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  const data = JSON.parse(xhr.responseText);
+                  if (data.url) {
+                    const serverUrl = new URL(data.url, window.location.origin).href;
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('link', serverUrl);
+                    newUrl.searchParams.set('name', file.name.replace(/\.[^/.]+$/, ""));
+                    
+                    // 上傳完成：切換為綠色 LED
+                    mainActionBtn.classList.remove("uploading-led");
+                    mainActionBtn.classList.add("active-led");
+                    if (span) {
+                      span.innerHTML = '<i class="fa-solid fa-check"></i> 上傳完成';
+                    }
+                    if (progressBar) progressBar.style.width = '100%';
+                    if (progressText) progressText.textContent = '100%';
+
+                    // 等待 2s 後進入播放
+                    setTimeout(() => {
+                      window.location.href = newUrl.href;
+                    }, 2000);
+                  }
+                } catch (e) {
+                  console.error('Error parsing response:', e);
+                  showToast('上傳失敗，伺服器回應錯誤！');
+                  resetUploadUI();
+                }
+              } else {
+                showToast('上傳失敗，請確認伺服器已啟動！');
+                resetUploadUI();
+              }
+            });
+
+            xhr.addEventListener('error', () => {
+              console.error('Error uploading file');
+              showToast('上傳失敗，網路連線錯誤！');
+              resetUploadUI();
+            });
+
+            xhr.open('POST', '/upload', true);
+            xhr.send(formData);
           }
         });
-
-        xhr.addEventListener('error', () => {
-          console.error('Error uploading file');
-          showToast('上傳失敗，網路連線錯誤！');
-          resetUploadUI();
-        });
-
-        xhr.open('POST', '/upload', true);
-        xhr.send(formData);
       })
       .catch(error => {
         if (error.message === 'UNAUTHORIZED') {
@@ -804,7 +866,7 @@ if (mainActionBtn && localUploadInput) {
 
     function resetUploadUI() {
       if (progressContainer) {
-        progressContainer.style.display = 'none';
+        progressContainer.classList.remove('active');
       }
       if (progressBar) progressBar.classList.remove('flash-effect');
       mainActionBtn.classList.remove("uploading-led", "active-led", "pressed");
