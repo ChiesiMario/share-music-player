@@ -292,9 +292,9 @@ const isLinkMode = !!url.searchParams.get('link');
 if (!isLinkMode) {
   loadSong(songs[songIndex]);
 } else {
-  // Hide default cover to prevent vinyl record flash while metadata is loading
+  // Show default cover (vinyl logo) while metadata is loading
   const defaultCover = document.getElementById('default-cover');
-  if (defaultCover) defaultCover.style.display = 'none';
+  if (defaultCover) defaultCover.style.display = 'flex';
 }
 
 function showControls() {
