@@ -373,9 +373,13 @@ function loadSong(song) {
 
 
 const isLinkMode = !!url.searchParams.get('link');
+const themeSwitchRow = document.getElementById("theme-switch-row");
+
 if (!isLinkMode) {
+  if (themeSwitchRow) themeSwitchRow.style.display = "none";
   loadSong(songs[songIndex]);
 } else {
+  if (themeSwitchRow) themeSwitchRow.style.display = "none"; // Hide initially during load
   // Show default cover (vinyl logo) while metadata is loading
   const defaultCover = document.getElementById('default-cover');
   if (defaultCover) defaultCover.style.display = 'flex';
@@ -396,6 +400,11 @@ function showControls() {
       const topNav = document.getElementById("top-nav");
       if (topNav) {
         topNav.classList.add('show');
+      }
+
+      if (themeSwitchRow) {
+        themeSwitchRow.style.display = "flex";
+        // Optionally add animation class here if needed later
       }
 
       const controlsDiv = document.getElementById("controls");

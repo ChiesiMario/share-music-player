@@ -71,7 +71,7 @@ html {
 /* Artwork - Base Container */
 .artwork-container {
   width: 75%;
-  margin: 0 auto 20px auto;
+  margin: 0 auto 10px auto;
   aspect-ratio: 1 / 1;
   position: relative;
   display: flex;
@@ -346,7 +346,7 @@ html {
     /* Inner highlight at bottom */
     0 1px 1px rgba(255, 255, 255, 0.8);
   /* Outer chassis lip highlight */
-  padding: 28px 16px;
+  padding: min(3vh, 22px) 16px;
   /* Pad inside the screen area */
 }
 
@@ -414,7 +414,7 @@ html {
 .lcd-eq {
   position: absolute;
   inset: 0;
-  /* Cover the entire track-info */
+  /* Cover the LCD screen area */
   padding: 6px;
   display: flex;
   justify-content: space-between;
@@ -1222,87 +1222,65 @@ html {
   }
 }
 
-/* Theme Toggle Button */
-.theme-toggle-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 45px;
-  height: 45px;
 /* Skeuomorphic Switch Container */
-.theme-switch-container {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-}
-
-/* Skeuomorphic Switch Checkbox */
-.skeuo-switch {
-  appearance: none;
+.theme-switch-wrapper {
+  position: relative;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 12px;
 }
 
 .skeuo-switch-input {
   display: none;
 }
 
-/* Skeuomorphic Switch Track */
+/* Skeuomorphic Circular Thumb Switch Track */
 .skeuo-switch-track {
-  width: 48px;
-  height: 24px;
-  background: #111;
-  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  background: #aab0b5;
+  border-radius: 50%;
   position: relative;
   box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.8),
-    inset 0 1px 1px rgba(0, 0, 0, 0.5),
-    0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 1px 1px rgba(255, 255, 255, 0.7);
   transition: background 0.3s ease;
-  border: 1px solid #000;
+  border: 1px solid #888;
 }
 
-/* Switch Thumb (The physical toggler) */
+/* Switch Thumb (Circular Push Button) */
 .skeuo-switch-thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
+  top: 1px;
+  left: 1px;
+  width: 18px;
   height: 18px;
-  background: linear-gradient(to bottom, #555 0%, #333 100%);
-  border-radius: 2px;
+  background: radial-gradient(circle at 50% 10%, #d5d5d5 0%, #b8b8b8 50%, #999 100%);
+  border-radius: 50%;
   box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    1px 0 2px rgba(0, 0, 0, 0.5);
-  transition: left 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-  border: 1px solid #222;
-  /* Grip lines */
-  background-image: repeating-linear-gradient(
-    to right,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.2) 2px,
-    rgba(0, 0, 0, 0.2) 4px
-  );
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    0 2px 3px rgba(0, 0, 0, 0.5);
+  transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border: 1px solid #777;
   z-index: 2;
 }
 
-/* Switch Checked State */
+/* Switch Checked State (Pushed Down) */
 .skeuo-switch-input:checked + .skeuo-switch-track {
-  background: #1a1a1a;
+  background: #aab0b5;
 }
 
 .skeuo-switch-input:checked + .skeuo-switch-track .skeuo-switch-thumb {
-  left: 24px;
+  top: 2px;
+  background: radial-gradient(circle at 50% 10%, #c4c4c4 0%, #a6a6a6 50%, #888 100%);
   box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    -1px 0 2px rgba(0, 0, 0, 0.5);
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    0 0 1px rgba(0, 0, 0, 0.8);
 }
 
-/* LED Indicator for Switch */
+/* LED Indicator for Switch (Middle Left) */
 .skeuo-switch-led {
   position: absolute;
   top: 8px;
@@ -1310,12 +1288,12 @@ html {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #333;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  background: #6a0000;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.8), 0 1px 1px rgba(255, 255, 255, 0.7);
   transition: all 0.3s ease;
 }
 
 .skeuo-switch-input:checked + .skeuo-switch-track .skeuo-switch-led {
   background: #00ff44;
-  box-shadow: 0 0 6px #00ff44, inset 0 1px 1px rgba(255,255,255,0.8);
+  box-shadow: 0 0 6px #00ff44, inset 1px 1px 1px rgba(0,0,0,0.2);
 }

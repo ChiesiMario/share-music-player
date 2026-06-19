@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=72" />
+  <link rel="stylesheet" href="./style.css?v=91" />
 </head>
 
 <body>
@@ -58,16 +58,17 @@
           </div>
         </div>
         <img id="cover" src="" alt="Cover Art" style="display: none;" />
-
       </div>
 
-      <label class="theme-switch-wrapper" title="切換動態主題色">
-        <input type="checkbox" id="theme-switch" class="skeuo-switch-input" checked>
-        <div class="skeuo-switch-track">
-          <div class="skeuo-switch-thumb"></div>
-          <div class="skeuo-switch-led"></div>
-        </div>
-      </label>
+      <div id="theme-switch-row" class="theme-switch-row" style="display: none; justify-content: flex-end; width: 100%; margin-bottom: 4px;">
+        <label class="theme-switch-wrapper" title="切換動態主題色" style="margin-right: 6px;">
+          <input type="checkbox" id="theme-switch" class="skeuo-switch-input" checked>
+          <div class="skeuo-switch-track">
+            <div class="skeuo-switch-thumb"></div>
+            <div class="skeuo-switch-led"></div>
+          </div>
+        </label>
+      </div>
 
       <div class="track-info">
         <div class="lcd-eq" id="lcd-eq">
