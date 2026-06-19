@@ -41,7 +41,8 @@ function setupAudioAnalyzer() {
   try {
     mediaSourceNode = audioCtx.createMediaElementSource(music);
     analyserNode = audioCtx.createAnalyser();
-    analyserNode.fftSize = 128; // 64 frequency bins
+    analyserNode.fftSize = 256; // 128 frequency bins
+    analyserNode.smoothingTimeConstant = 0.8; // Smoother visual bouncing
 
     mediaSourceNode.connect(analyserNode);
     analyserNode.connect(audioCtx.destination);
@@ -69,14 +70,27 @@ function updateVisualizer() {
       analyserNode.getByteFrequencyData(visualizerDataArray);
     }
 
+    const numBars = bars.length;
+
     bars.forEach((bar, index) => {
       let val = 0;
       if (useFake) {
         // Fake frequency bounce if CORS blocks Web Audio API
         val = Math.random() * 200 + 20; // Random value between 20 and 220
       } else {
-        // Use bins 0 to 31 (skip higher frequencies for better visuals)
-        val = visualizerDataArray[index] || 0;
+        // Logarithmic mapping: concentrate more bars on the low end (bass/kick)
+        const minBin = 1;
+        const maxBin = 80;
+        
+        const ratio = index / (numBars - 1);
+        const logMin = Math.log(minBin);
+        const logMax = Math.log(maxBin);
+        const binIndex = Math.floor(Math.exp(logMin + ratio * (logMax - logMin)));
+        
+        val = visualizerDataArray[binIndex] || 0;
+        
+        // Dynamic Energy Boost: Increase contrast for stronger beats
+        val = Math.pow(val / 255, 1.5) * 255;
       }
       // Normalize 0-255 to 0.05-1.0
       const scale = Math.max(0.05, val / 255);
@@ -84,10 +98,8 @@ function updateVisualizer() {
     });
   }
 
-  // Throttle animation to make it look like a chunky LCD screen update (~15fps)
-  setTimeout(() => {
-    animationFrameId = requestAnimationFrame(updateVisualizer);
-  }, 60);
+  // Fluid 60fps rendering
+  animationFrameId = requestAnimationFrame(updateVisualizer);
 }
 
 
