@@ -830,58 +830,71 @@ html {
   margin-bottom: 0;
 }
 
-.pixel-progress-wrapper {
-  width: 100%;
+.retro-loading-container {
+  width: 70%;
+  background-color: #000;
+  padding: 10px 0;
   display: none;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  position: relative;
+  margin: 15px auto 0 auto;
+  box-sizing: border-box;
 }
 
-.pixel-progress-track {
+.retro-loading-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  color: #fff;
+  font-family: "DotGothic16", "Courier New", Courier, monospace;
+  font-weight: bold;
+  font-size: 13px; /* Slightly adjusted to accommodate pixel font readability */
+  padding: 0 5px;
+}
+
+.retro-loading-track {
   width: 100%;
   height: 18px;
+  border: 2px solid #fff;
+  padding: 2px;
+  box-sizing: border-box;
+  background-color: #000;
   position: relative;
-  background-color: transparent;
-  background-image: repeating-linear-gradient(
-    to right,
-    #2c3a50,
-    #2c3a50 6px,
-    #0a192f 6px,
-    #0a192f 8px
-  );
-  border: 1px solid #555555;
-  box-shadow: 0 0 5px rgba(85, 85, 85, 0.4);
-  transition: border-color 0.1s linear, box-shadow 0.1s linear;
 }
 
-#lcd-upload-progress-bar {
+.retro-loading-track::after {
+  content: '';
+  position: absolute;
+  top: 2px; 
+  left: 2px; 
+  right: 2px; 
+  bottom: 2px;
+  background-image: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 80%,
+    #000 80%,
+    #000 100%
+  );
+  background-size: 5% 100%; /* Exactly 20 segments */
+  pointer-events: none;
+  z-index: 10;
+}
+
+.retro-loading-bar {
   height: 100%;
   width: 0%;
-  background-color: #aaaaaa;
-  background-image: repeating-linear-gradient(
-    to right,
-    transparent,
-    transparent 6px,
-    #0a192f 6px,
-    #0a192f 8px
-  );
-  box-shadow: 0 0 5px rgba(170, 170, 170, 0.8);
-  transition: width 0.1s linear, background-color 0.1s linear, box-shadow 0.1s linear;
+  background-color: #fff;
+  transition: width 0.1s linear, background-color 0.2s linear, box-shadow 0.2s linear;
 }
 
-.pixel-progress-pct {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: 'DotGothic16', sans-serif;
-  font-size: 14px;
-  color: #fff;
-  text-align: center;
-  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
-  z-index: 5;
-  pointer-events: none;
+@keyframes violentFlash {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  25% { opacity: 0; filter: brightness(3); }
+  50% { opacity: 1; filter: brightness(2); }
+  75% { opacity: 0; filter: brightness(4); }
+}
+
+.flash-effect {
+  animation: violentFlash 0.4s infinite;
 }
 
 .progress-bar-bg {

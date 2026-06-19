@@ -721,22 +721,22 @@ if (mainActionBtn && localUploadInput) {
               progressBar.style.width = percentComplete + '%';
               
               if (percentComplete < 50) {
-                progressBar.style.backgroundColor = '#aaaaaa';
-                progressBar.style.boxShadow = '0 0 8px rgba(170, 170, 170, 0.8)';
-                if (progressTrack) {
-                  progressTrack.style.borderColor = '#aaaaaa';
-                  progressTrack.style.boxShadow = '0 0 8px rgba(170, 170, 170, 0.4)';
-                }
+                progressBar.style.backgroundColor = '#fff';
+                progressBar.style.boxShadow = 'none';
+                progressBar.classList.remove('flash-effect');
               } else {
                 const ratio = (percentComplete - 50) / 50; // 0 to 1
-                const r = Math.round(170 + (84 - 170) * ratio);
-                const g = Math.round(170 + (200 - 170) * ratio);
-                const b = Math.round(170 + (250 - 170) * ratio);
-                progressBar.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-                progressBar.style.boxShadow = `0 0 8px rgba(${r}, ${g}, ${b}, 0.8)`;
-                if (progressTrack) {
-                  progressTrack.style.borderColor = `rgb(${r}, ${g}, ${b})`;
-                  progressTrack.style.boxShadow = `0 0 8px rgba(${r}, ${g}, ${b}, 0.4)`;
+                const r = Math.round(255 + (0 - 255) * ratio);
+                const g = Math.round(255 + (229 - 255) * ratio);
+                const b = 255;
+                const hexColor = `rgb(${r}, ${g}, ${b})`;
+                progressBar.style.backgroundColor = hexColor;
+                progressBar.style.boxShadow = `0 0 ${10 * ratio}px ${hexColor}, 0 0 ${20 * ratio}px ${hexColor}`;
+                
+                if (percentComplete >= 85) {
+                  progressBar.classList.add('flash-effect');
+                } else {
+                  progressBar.classList.remove('flash-effect');
                 }
               }
             }
@@ -766,10 +766,10 @@ if (mainActionBtn && localUploadInput) {
                 if (progressBar) progressBar.style.width = '100%';
                 if (progressText) progressText.textContent = '100%';
 
-                // 等待 1s 後進入播放
+                // 等待 2s 後進入播放
                 setTimeout(() => {
                   window.location.href = newUrl.href;
-                }, 1000);
+                }, 2000);
               }
             } catch (e) {
               console.error('Error parsing response:', e);
@@ -803,7 +803,10 @@ if (mainActionBtn && localUploadInput) {
     }, 1000);
 
     function resetUploadUI() {
-      if (progressContainer) progressContainer.style.display = 'none';
+      if (progressContainer) {
+        progressContainer.style.display = 'none';
+      }
+      if (progressBar) progressBar.classList.remove('flash-effect');
       mainActionBtn.classList.remove("uploading-led", "active-led", "pressed");
       mainActionBtn.disabled = false;
       if (span) {

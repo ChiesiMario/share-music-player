@@ -123,10 +123,13 @@
               <i class="fa-solid fa-circle-info"></i> 上傳的文件會在 36 小時後刪除
             </p>
 
-            <div id="lcd-upload-progress-container" class="pixel-progress-wrapper" style="display: none;">
-              <div id="lcd-upload-progress-track" class="pixel-progress-track">
-                <div id="lcd-upload-progress-bar"></div>
-                <span id="lcd-upload-progress-text" class="pixel-progress-pct">0%</span>
+            <div id="lcd-upload-progress-container" class="retro-loading-container" style="display: none;">
+              <div class="retro-loading-header">
+                <span class="retro-loading-text">Loading</span>
+                <span id="lcd-upload-progress-text" class="retro-loading-pct">0%</span>
+              </div>
+              <div id="lcd-upload-progress-track" class="retro-loading-track">
+                <div id="lcd-upload-progress-bar" class="retro-loading-bar"></div>
               </div>
             </div>
           </div>
