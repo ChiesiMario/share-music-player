@@ -68,7 +68,7 @@ html {
   align-items: center;
   border-radius: 12px;
   background: transparent;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Artwork - The Recessed Tray (Only active when cover is loaded) */
@@ -246,6 +246,16 @@ html {
     inset 0 1px 1px rgba(255, 255, 255, 0.3);
   /* Subtle glossy surface highlight */
   display: block;
+  opacity: 0;
+}
+
+.artwork-container.has-cover img {
+  animation: fadeInCover 0.3s ease forwards;
+}
+
+@keyframes fadeInCover {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 
@@ -325,8 +335,8 @@ html {
     /* Inner highlight at bottom */
     0 1px 1px rgba(255, 255, 255, 0.8);
   /* Outer chassis lip highlight */
-  padding: 18px 12px;
-  /* Pad inside the screen area (6px + 12px = 18px) */
+  padding: 28px 16px;
+  /* Pad inside the screen area */
 }
 
 /* The actual LCD screen sitting inside the tray */
@@ -1151,7 +1161,7 @@ html {
 
   .track-info {
     margin-bottom: min(2vh, 10px);
-    padding: min(2vh, 14px) 12px;
+    padding: min(3vh, 22px) 16px;
   }
 
   #url-play-btn-wrapper {

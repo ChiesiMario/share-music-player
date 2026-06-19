@@ -107,6 +107,19 @@ const songs = [
 
 let songIndex = 0;
 let isPlaying = false;
+let currentSongDuration = 0;
+
+// Utility to lazy load external scripts
+const loadScript = (url) => {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${url}"]`)) return resolve();
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+};
 
 function togglePlay() {
   if (isPlaying) {
@@ -207,6 +220,10 @@ function loadSong(song) {
   if (song.cover && song.cover !== './img/logo.png') {
     image.src = `${song.cover}`;
     image.style.display = 'block';
+    
+    // Force a browser reflow so the CSS fade-in animation triggers correctly
+    void image.offsetWidth;
+    
     document.getElementById('default-cover').style.display = 'none';
     document.querySelector('.artwork-container').classList.add('has-cover');
     if (background) background.style.backgroundImage = `url(${song.cover})`;
@@ -250,7 +267,14 @@ function loadSong(song) {
 
 
 
-loadSong(songs[songIndex]);
+const isLinkMode = !!url.searchParams.get('link');
+if (!isLinkMode) {
+  loadSong(songs[songIndex]);
+} else {
+  // Hide default cover to prevent vinyl record flash while metadata is loading
+  const defaultCover = document.getElementById('default-cover');
+  if (defaultCover) defaultCover.style.display = 'none';
+}
 
 function showControls() {
   if (fetchProgressContainer) {
@@ -287,15 +311,33 @@ if (songs[0].mp3link) {
     fetchProgressContainer.style.display = 'block';
   }
 
-  const jsmediatags = window.jsmediatags;
-
   const processTag = function (tag) {
     const tags = tag.tags;
 
     songs[0].displayName = tags.title || (songs[0].displayName === '' ? '未找到歌曲' : songs[0].displayName);
     songs[0].artist = tags.artist || (songs[0].artist === '' ? '未知歌手' : songs[0].artist);
     songs[0].album = tags.album || '';
-    songs[0].year = tags.year || '';
+    // Robust year extraction for various formats (ID3, Vorbis, etc.)
+    let extractedYear = '';
+    const possibleYearKeys = ['year', 'date', 'DATE', 'Date', 'YEAR', 'Year', 'TYER', 'TDRC', 'originalyear', 'ORIGINALYEAR'];
+    for (const key of possibleYearKeys) {
+      if (tags[key]) {
+        extractedYear = typeof tags[key] === 'string' ? tags[key] : (tags[key].data || tags[key][0] || '');
+        if (extractedYear) break;
+      }
+    }
+    
+    // Fallback: search all keys
+    if (!extractedYear) {
+      for (const key in tags) {
+        if (key.toLowerCase().includes('year') || key.toLowerCase().includes('date')) {
+          const val = tags[key];
+          extractedYear = typeof val === 'string' ? val : (val && val.data ? val.data : (Array.isArray(val) ? val[0] : ''));
+          if (extractedYear) break;
+        }
+      }
+    }
+    songs[0].year = typeof extractedYear === 'string' ? extractedYear : String(extractedYear || '');
 
     if (tags.picture) {
       const data = tags.picture.data;
@@ -408,10 +450,65 @@ if (songs[0].mp3link) {
   }
 
   const loadAndParseMetadata = async () => {
-    // 1. Initial attempt using direct URL (Skip for GitHub raw due to lack of OPTIONS support)
+    // 1a. Try fetching metadata from our own server API (fastest and most reliable for uploaded files)
+    const isLocalServer = songs[0].mp3link.includes(window.location.origin) || songs[0].mp3link.startsWith('./uploads');
+    if (isLocalServer) {
+      try {
+        const response = await fetch(`/metadata?url=${encodeURIComponent(songs[0].mp3link)}`);
+        if (response.ok) {
+          const common = await response.json();
+          if (common && common.title) {
+            songs[0].displayName = common.title || (songs[0].displayName === '' ? '未找到歌曲' : songs[0].displayName);
+            songs[0].artist = common.artist || (songs[0].artist === '' ? '未知歌手' : songs[0].artist);
+            songs[0].album = common.album || '';
+            songs[0].year = common.year || common.date || common.originalyear || '';
+
+            if (common.coverData) {
+              songs[0].cover = common.coverData;
+            }
+            if (songIndex === 0) { showControls(); loadSong(songs[0]); }
+            return; // Success!
+          }
+        }
+      } catch (err) {
+        console.log('Server metadata API failed, falling back...', err);
+      }
+    }
+
+    // 1b. Try music-metadata-browser using Range requests (superior for FLAC, etc.)
     const isGitHubRaw = songs[0].mp3link.includes('raw.githubusercontent.com');
     if (!isGitHubRaw) {
       try {
+        await loadScript('https://unpkg.com/music-metadata-browser@2.5.10/dist/index.min.js');
+        const metadata = await musicMetadata.fetchFromUrl(songs[0].mp3link);
+        const common = metadata.common;
+        if (common) {
+          songs[0].displayName = common.title || (songs[0].displayName === '' ? '未找到歌曲' : songs[0].displayName);
+          songs[0].artist = common.artist || (songs[0].artist === '' ? '未知歌手' : songs[0].artist);
+          songs[0].album = common.album || '';
+          songs[0].year = common.year || common.date || common.originalyear || '';
+
+          if (common.picture && common.picture.length > 0) {
+            const pic = common.picture[0];
+            const picBlob = new Blob([pic.data], { type: pic.format });
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              songs[0].cover = e.target.result;
+              if (songIndex === 0) { showControls(); loadSong(songs[0]); }
+            };
+            reader.readAsDataURL(picBlob);
+          } else {
+            if (songIndex === 0) { showControls(); loadSong(songs[0]); }
+          }
+          return; // Success!
+        }
+      } catch (err) {
+        console.log('musicMetadata URL fetch failed, falling back to jsmediatags...', err);
+      }
+      
+      // 1b. Fallback to jsmediatags Range request
+      try {
+        await loadScript('https://unpkg.com/jsmediatags@3.9.5/dist/jsmediatags.min.js');
         await new Promise((resolve, reject) => {
           jsmediatags.read(songs[0].mp3link, {
             onSuccess: (tag) => {
@@ -455,26 +552,62 @@ if (songs[0].mp3link) {
     title.textContent = '歌曲信息解析中 ……';
 
     let parsed = false;
-    for (let parseAttempt = 1; parseAttempt <= 2; parseAttempt++) {
-      try {
-        await new Promise((resolve, reject) => {
-          jsmediatags.read(blob, {
-            onSuccess: (tag) => {
-              processTag(tag);
-              parsed = true;
-              resolve();
-            },
-            onError: reject
+    
+    // 3a. Try music-metadata-browser first (superior for FLAC, M4A, etc.)
+    try {
+      if (window.musicMetadata) {
+        const metadata = await window.musicMetadata.parseBlob(blob);
+        const common = metadata.common;
+        if (common) {
+          songs[0].displayName = common.title || (songs[0].displayName === '' ? '未找到歌曲' : songs[0].displayName);
+          songs[0].artist = common.artist || (songs[0].artist === '' ? '未知歌手' : songs[0].artist);
+          songs[0].album = common.album || '';
+          // Try year, date, originalyear
+          songs[0].year = common.year || common.date || common.originalyear || '';
+
+          if (common.picture && common.picture.length > 0) {
+            const pic = common.picture[0];
+            const picBlob = new Blob([pic.data], { type: pic.format });
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              songs[0].cover = e.target.result;
+              if (songIndex === 0) { showControls(); loadSong(songs[0]); }
+            };
+            reader.readAsDataURL(picBlob);
+          } else {
+            if (songIndex === 0) { showControls(); loadSong(songs[0]); }
+          }
+          parsed = true;
+        }
+      }
+    } catch (err) {
+      console.warn('musicMetadata parse failed, falling back to jsmediatags:', err);
+    }
+
+    // 3b. Fallback to jsmediatags
+    if (!parsed) {
+      for (let parseAttempt = 1; parseAttempt <= 2; parseAttempt++) {
+        try {
+          await loadScript('https://unpkg.com/jsmediatags@3.9.5/dist/jsmediatags.min.js');
+          await new Promise((resolve, reject) => {
+            jsmediatags.read(blob, {
+              onSuccess: (tag) => {
+                processTag(tag);
+                parsed = true;
+                resolve();
+              },
+              onError: reject
+            });
           });
-        });
-        if (parsed) break;
-      } catch (err) {
-        console.warn(`Blob parse attempt ${parseAttempt} failed:`, err);
-        if (parseAttempt === 2) {
-          processError(err);
-        } else {
-          title.textContent = '解析失敗，重試中...';
-          await new Promise(r => setTimeout(r, 1000));
+          if (parsed) break;
+        } catch (err) {
+          console.warn(`Blob parse attempt ${parseAttempt} failed:`, err);
+          if (parseAttempt === 2) {
+            processError(err);
+          } else {
+            title.textContent = '解析失敗，重試中...';
+            await new Promise(r => setTimeout(r, 1000));
+          }
         }
       }
     }
@@ -672,7 +805,7 @@ if (mainActionBtn && localUploadInput) {
     }, 2000);
   }
 
-  function processLocalFile(file) {
+  async function processLocalFile(file) {
     const passwordInput = document.getElementById('upload-password-input');
     const password = passwordInput ? passwordInput.value : '';
 
@@ -699,7 +832,7 @@ if (mainActionBtn && localUploadInput) {
         if (!res.ok) throw new Error('VERIFY_FAILED');
         return res.json();
       })
-      .then(() => {
+      .then(async () => {
         // 驗證成功：顯示進度條、點亮紅色呼吸燈，開始上傳
         if (progressContainer) {
           progressContainer.classList.add('active');
@@ -712,6 +845,7 @@ if (mainActionBtn && localUploadInput) {
 
         const ext = file.name.substring(file.name.lastIndexOf('.'));
         
+        await loadScript('https://unpkg.com/spark-md5@3.0.2/spark-md5.min.js');
         function calculateMD5(file) {
           return new Promise((resolve, reject) => {
             const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;

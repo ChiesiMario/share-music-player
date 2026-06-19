@@ -38,7 +38,7 @@
       </div>
 
       <div class="artwork-container">
-        <div class="default-cover" id="default-cover">
+        <div class="default-cover" id="default-cover" style="display: none;">
           <div class="share-card-modern">
             <div class="eq-bars">
               <div class="bar"></div>
@@ -173,9 +173,8 @@
 
   <div id="toast">已複製音樂連結！</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js"></script>
-  <script src="./script.js?v=70"></script>
+  <!-- CDN scripts are now lazy-loaded dynamically via script.js ONLY when needed -->
+  <script src="./script.js?v=71"></script>
 </body>
 
 </html>

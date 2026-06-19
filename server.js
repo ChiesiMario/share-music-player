@@ -4,13 +4,16 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const mm = require('music-metadata');
 
 const app = express();
 const port = 8000;
 const UPLOAD_PASSWORD = 'admin'; // 預設上傳密碼
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with exposed headers for Range requests
+app.use(cors({
+  exposedHeaders: ['Content-Length', 'Content-Range', 'Accept-Ranges']
+}));
 app.use(express.json());
 
 // Serve the frontend static files
@@ -75,7 +78,7 @@ app.post('/check-file', (req, res) => {
 });
 
 // Upload API endpoint
-app.post('/upload', upload.single('musicFile'), (req, res) => {
+app.post('/upload', upload.single('musicFile'), async (req, res) => {
   const password = req.body.password;
 
   if (password !== UPLOAD_PASSWORD) {
@@ -90,6 +93,21 @@ app.post('/upload', upload.single('musicFile'), (req, res) => {
   }
 
   const tempPath = req.file.path;
+  
+  // Try to parse metadata
+  let meta = null;
+  try {
+    const metadata = await mm.parseFile(tempPath);
+    meta = metadata.common;
+    if (meta && meta.picture && meta.picture.length > 0) {
+      const pic = meta.picture[0];
+      meta.coverData = `data:${pic.format};base64,${Buffer.from(pic.data).toString('base64')}`;
+      delete meta.picture; // Don't send raw buffer array over JSON
+    }
+  } catch (err) {
+    console.error('Error parsing metadata:', err);
+  }
+
   const hash = crypto.createHash('md5');
   const stream = fs.createReadStream(tempPath);
 
@@ -119,7 +137,8 @@ app.post('/upload', upload.single('musicFile'), (req, res) => {
     res.json({
       message: 'File uploaded successfully',
       url: fileUrl,
-      filename: req.file.originalname
+      filename: req.file.originalname,
+      metadata: meta
     });
   });
 
@@ -127,6 +146,40 @@ app.post('/upload', upload.single('musicFile'), (req, res) => {
     console.error('Error hashing file:', err);
     res.status(500).json({ error: 'Error processing file' });
   });
+});
+
+// Metadata API endpoint for direct fetching of file tags
+app.get('/metadata', async (req, res) => {
+  const fileUrl = req.query.url;
+  if (!fileUrl) return res.status(400).json({ error: 'Missing url parameter' });
+
+  try {
+    const urlObj = new URL(fileUrl, `http://localhost:${port}`);
+    const filePath = path.join(__dirname, decodeURIComponent(urlObj.pathname));
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found on server' });
+    }
+
+    const metadata = await mm.parseFile(filePath);
+    const common = metadata.common;
+    const meta = {
+      title: common.title,
+      artist: common.artist,
+      album: common.album,
+      year: common.year || common.date || common.originalyear || ''
+    };
+
+    if (common.picture && common.picture.length > 0) {
+      const pic = common.picture[0];
+      meta.coverData = `data:${pic.format};base64,${Buffer.from(pic.data).toString('base64')}`;
+    }
+
+    res.json(meta);
+  } catch (err) {
+    console.error('Error in /metadata endpoint:', err);
+    res.status(500).json({ error: 'Failed to parse metadata' });
+  }
 });
 // --- File Cleanup Mechanism ---
 // Check and delete files older than 36 hours
