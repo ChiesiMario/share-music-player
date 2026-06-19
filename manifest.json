@@ -1,0 +1,17 @@
+{
+  "name": "Music Share 音樂分享",
+  "short_name": "Music Share 音樂分享",
+  "description": "A beautiful web-based music player with sharing capabilities.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2b3138",
+  "theme_color": "#2b3138",
+  "icons": [
+    {
+      "src": "/vinyl.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
