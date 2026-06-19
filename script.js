@@ -672,9 +672,7 @@ if (mainActionBtn && localUploadInput) {
     mainActionBtn.classList.add("pressed"); // 剛點擊時不亮燈
     mainActionBtn.disabled = true;
     const span = mainActionBtn.querySelector('span');
-    if (span) {
-      span.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 準備中...';
-    }
+    // Button text remains fixed
 
     const progressContainer = document.getElementById('lcd-upload-progress-container');
     const progressTrack = document.getElementById('lcd-upload-progress-track');
@@ -683,9 +681,7 @@ if (mainActionBtn && localUploadInput) {
 
     // 等待 1s 後驗證密碼
     setTimeout(() => {
-      if (span) {
-        span.innerHTML = '<i class="fa-solid fa-shield-halved fa-beat"></i> 驗證密碼...';
-      }
+      // Button text remains fixed
       fetch('/verify-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -705,9 +701,7 @@ if (mainActionBtn && localUploadInput) {
         if (progressText) progressText.textContent = '分析中...';
 
         mainActionBtn.classList.add("uploading-led");
-        if (span) {
-          span.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> 上傳中...';
-        }
+        // Button text remains fixed as "Play"
 
         const ext = file.name.substring(file.name.lastIndexOf('.'));
         
@@ -751,14 +745,9 @@ if (mainActionBtn && localUploadInput) {
             // 秒傳成功
             mainActionBtn.classList.remove("uploading-led");
             mainActionBtn.classList.add("active-led");
-            if (span) {
-              span.innerHTML = '<i class="fa-solid fa-bolt"></i> 秒傳成功';
-            }
+            // Button text remains fixed
             if (progressBar) {
               progressBar.style.width = '100%';
-              progressBar.style.backgroundColor = '#54c8fa';
-              progressBar.style.boxShadow = '0 0 20px #54c8fa, 0 0 40px #54c8fa, 0 0 80px #54c8fa';
-              progressBar.classList.add('flash-effect');
             }
             if (progressText) progressText.textContent = '100%';
 
@@ -769,7 +758,7 @@ if (mainActionBtn && localUploadInput) {
             
             setTimeout(() => {
               window.location.href = newUrl.href;
-            }, 2000);
+            }, 1000);
           } else {
             if (progressText) progressText.textContent = '0%';
             
@@ -784,21 +773,6 @@ if (mainActionBtn && localUploadInput) {
                 const percentComplete = Math.round((e.loaded / e.total) * 100);
                 if (progressBar) {
                   progressBar.style.width = percentComplete + '%';
-                  
-                  if (percentComplete < 50) {
-                    progressBar.style.backgroundColor = '#54c8fa';
-                    progressBar.style.boxShadow = 'none';
-                    progressBar.classList.remove('flash-effect');
-                  } else {
-                    const ratio = (percentComplete - 50) / 50; // 0 to 1
-                    progressBar.style.backgroundColor = '#54c8fa';
-                    const glow1 = 8 + 12 * ratio;
-                    const glow2 = 0 + 40 * ratio;
-                    const glow3 = 0 + 80 * ratio;
-                    progressBar.style.boxShadow = `0 0 ${glow1}px #54c8fa, 0 0 ${glow2}px #54c8fa, 0 0 ${glow3}px #54c8fa`;
-                    
-                    progressBar.classList.add('flash-effect');
-                  }
                 }
                 if (progressText) progressText.textContent = percentComplete + '%';
               }
@@ -820,16 +794,14 @@ if (mainActionBtn && localUploadInput) {
                     // 上傳完成：切換為綠色 LED
                     mainActionBtn.classList.remove("uploading-led");
                     mainActionBtn.classList.add("active-led");
-                    if (span) {
-                      span.innerHTML = '<i class="fa-solid fa-check"></i> 上傳完成';
-                    }
+                    // Button text remains fixed
                     if (progressBar) progressBar.style.width = '100%';
                     if (progressText) progressText.textContent = '100%';
 
-                    // 等待 2s 後進入播放
+                    // 等待 1s 後進入播放
                     setTimeout(() => {
                       window.location.href = newUrl.href;
-                    }, 2000);
+                    }, 1000);
                   }
                 } catch (e) {
                   console.error('Error parsing response:', e);

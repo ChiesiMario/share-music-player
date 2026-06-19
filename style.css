@@ -831,7 +831,7 @@ html {
 }
 
 .retro-loading-container {
-  width: 70%;
+  width: 85%;
   background-color: transparent;
   margin: 0 auto 0 auto;
   box-sizing: border-box;
@@ -872,38 +872,27 @@ html {
 
 .retro-loading-track {
   width: 100%;
-  height: 18px;
-  border: 2px solid #54c8fa;
-  padding: 2px;
+  height: 12px;
+  background: #000;
+  border-radius: 6px;
+  border: 1px solid #1a1a1a;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 0;
   box-sizing: border-box;
-  background-color: transparent;
   position: relative;
 }
 
 .retro-loading-track::after {
-  content: '';
-  position: absolute;
-  top: 2px; 
-  left: 2px; 
-  right: 2px; 
-  bottom: 2px;
-  background-image: linear-gradient(
-    to right,
-    transparent 0%,
-    transparent 80%,
-    #0f1614 80%,
-    #0f1614 100%
-  );
-  background-size: 5% 100%; /* Exactly 20 segments */
-  pointer-events: none;
-  z-index: 10;
+  display: none;
 }
 
 .retro-loading-bar {
   height: 100%;
   width: 0%;
-  background-color: #54c8fa;
-  transition: width 0.1s linear, background-color 0.2s linear, box-shadow 0.2s linear;
+  background: linear-gradient(to bottom, #54c8fa 0%, #0088cc 100%);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 0 10px rgba(84, 200, 250, 0.6);
+  transition: width 0.1s linear, background 0.2s linear, box-shadow 0.2s linear;
 }
 
 @keyframes violentFlash {
