@@ -268,6 +268,13 @@ function showControls() {
       if (topNav) {
         topNav.classList.add('show');
       }
+
+      const controlsDiv = document.getElementById("controls");
+      if (controlsDiv) {
+        setTimeout(() => {
+          controlsDiv.style.opacity = '1';
+        }, 1100);
+      }
     }, 50);
   }
 }
