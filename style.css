@@ -3,6 +3,18 @@
   --theme-color-rgb: 84, 200, 250;
 }
 
+/* Global Transition for Theme Colors */
+.lcd-bar,
+.track-info h1,
+.track-info h2,
+.track-info h3,
+.track-info h4,
+.loading-text,
+.tabs-wrapper,
+.progress-fill {
+  transition: color 4s ease, text-shadow 4s ease, background-color 4s ease, box-shadow 4s ease, border-color 4s ease, background 4s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -974,10 +986,11 @@ html {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(to bottom, rgba(var(--theme-color-rgb), 1) 0%, #0088cc 100%);
+  background-color: rgba(var(--theme-color-rgb), 1);
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%);
   border-radius: 4px;
   width: 0%;
-  transition: width 0.1s linear;
+  transition: width 0.1s linear, background-color 4s ease;
   position: relative;
   box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
@@ -1207,4 +1220,102 @@ html {
     padding: 10px;
     font-size: 14px;
   }
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+/* Skeuomorphic Switch Container */
+.theme-switch-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+}
+
+/* Skeuomorphic Switch Checkbox */
+.skeuo-switch {
+  appearance: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.skeuo-switch-input {
+  display: none;
+}
+
+/* Skeuomorphic Switch Track */
+.skeuo-switch-track {
+  width: 48px;
+  height: 24px;
+  background: #111;
+  border-radius: 4px;
+  position: relative;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
+  border: 1px solid #000;
+}
+
+/* Switch Thumb (The physical toggler) */
+.skeuo-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 18px;
+  background: linear-gradient(to bottom, #555 0%, #333 100%);
+  border-radius: 2px;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    1px 0 2px rgba(0, 0, 0, 0.5);
+  transition: left 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border: 1px solid #222;
+  /* Grip lines */
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.2) 2px,
+    rgba(0, 0, 0, 0.2) 4px
+  );
+  z-index: 2;
+}
+
+/* Switch Checked State */
+.skeuo-switch-input:checked + .skeuo-switch-track {
+  background: #1a1a1a;
+}
+
+.skeuo-switch-input:checked + .skeuo-switch-track .skeuo-switch-thumb {
+  left: 24px;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    -1px 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* LED Indicator for Switch */
+.skeuo-switch-led {
+  position: absolute;
+  top: 8px;
+  left: -12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  transition: all 0.3s ease;
+}
+
+.skeuo-switch-input:checked + .skeuo-switch-track .skeuo-switch-led {
+  background: #00ff44;
+  box-shadow: 0 0 6px #00ff44, inset 0 1px 1px rgba(255,255,255,0.8);
 }
