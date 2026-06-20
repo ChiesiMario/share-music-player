@@ -73,14 +73,10 @@ themeSwitch.addEventListener('change', (e) => {
       // Re-extract and apply
       const rgbStr = extractDominantColor(image);
       document.documentElement.style.setProperty('--theme-color-rgb', rgbStr);
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute('content', `rgb(${rgbStr})`);
     }
   } else {
     // Revert to default blue
     document.documentElement.style.setProperty('--theme-color-rgb', '84, 200, 250');
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', '#2b3138');
   }
 });
 
@@ -381,8 +377,6 @@ function loadSong(song) {
       if (!isDynamicThemeEnabled) return;
       const rgbStr = extractDominantColor(image);
       document.documentElement.style.setProperty('--theme-color-rgb', rgbStr);
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute('content', `rgb(${rgbStr})`);
     };
     image.src = `${song.cover}`;
     image.style.display = 'block';
@@ -396,8 +390,6 @@ function loadSong(song) {
   } else {
     // Reset to default theme
     document.documentElement.style.setProperty('--theme-color-rgb', '84, 200, 250');
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', '#2b3138');
     
     artistLink.style.pointerEvents = 'none';
   }
@@ -1424,7 +1416,7 @@ document.addEventListener('mousedown', (e) => {
   }
 
   // Physical buttons
-  const btn = e.target.closest('button, .nav-btn, .url-play-btn-physical, .btn-play');
+  const btn = e.target.closest('button, .nav-btn, .url-play-btn-physical, .btn-play, .theme-switch-wrapper');
   if (btn && !btn.disabled && !btn.classList.contains('active-led')) {
     playClickSound();
   }
