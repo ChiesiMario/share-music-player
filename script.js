@@ -942,6 +942,16 @@ if (mainActionBtn && localUploadInput) {
         showToast('密碼錯誤！');
       });
     });
+
+    const passwordInput = document.getElementById('upload-password-input');
+    if (passwordInput) {
+      passwordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          verifyPasswordBtn.click();
+        }
+      });
+    }
   }
 
   // Main Action Button Handler
