@@ -1327,3 +1327,50 @@ if (volumeSlider) {
     osc.stop(t + 0.03);
   });
 }
+
+
+// --- Responsive Card Scaling ---
+function adjustPlayerScale() {
+  const wrapper = document.querySelector('.player-wrapper');
+  const card = document.querySelector('.player-card');
+  if (!wrapper || !card) return;
+
+  // Enforce absolute positioning for perfect centering unaffected by flexbox overflow
+  if (card.style.position !== 'absolute') {
+    card.style.position = 'absolute';
+    card.style.top = '50%';
+    card.style.left = '50%';
+    card.style.margin = '0';
+    card.style.transformOrigin = 'center center';
+  }
+  
+  const wrapperHeight = wrapper.clientHeight;
+  const cardHeight = card.offsetHeight;
+  
+  // Ensure we leave a vertical buffer
+  const targetHeight = wrapperHeight - 40;
+
+  if (cardHeight > targetHeight && targetHeight > 0) {
+    const scale = targetHeight / cardHeight;
+    card.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  } else {
+    card.style.transform = `translate(-50%, -50%) scale(1)`;
+  }
+}
+
+// Trigger scaling when window resizes
+window.addEventListener('resize', adjustPlayerScale);
+
+// Use ResizeObserver to detect when the card's internal height changes
+const cardToObserve = document.querySelector('.player-card');
+if (cardToObserve && window.ResizeObserver) {
+  const resizeObserver = new ResizeObserver(() => {
+    requestAnimationFrame(adjustPlayerScale);
+  });
+  resizeObserver.observe(cardToObserve);
+} else {
+  setInterval(adjustPlayerScale, 1000); // Fallback
+}
+
+// Initial calculation
+adjustPlayerScale();
