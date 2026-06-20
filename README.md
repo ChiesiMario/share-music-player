@@ -1,6 +1,6 @@
 # 🎵 Music Share Player (網頁音樂分享播放器)
 
-這是一個具有 **高度擬真質感 (Skeuomorphic Design)** 與 **復古黑膠唱片機風格** 的網頁版音樂播放器。
+這是一個具有**高度擬真質感 (Skeuomorphic Design)**與**復古黑膠唱片機風格**的網頁版音樂播放器。
 它不僅支援直接播放網路上的音樂連結，還提供密碼保護的「本機檔案上傳」功能，是您用來對外分享自建音樂庫、或是與朋友分享單曲的絕佳工具！
 
 ![Screenshot](https://raw.githubusercontent.com/ChiesiMario/share-music-player/main/image/Screenshot.png)
