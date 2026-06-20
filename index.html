@@ -60,7 +60,7 @@
         <img id="cover" src="" alt="Cover Art" style="display: none;" />
       </div>
 
-      <div id="theme-switch-row" class="theme-switch-row" style="display: none; justify-content: flex-end; width: 100%; margin-bottom: 4px;">
+      <div id="theme-switch-row" class="theme-switch-row" style="display: none; justify-content: flex-end; width: 100%; margin-bottom: 4px; margin-top: -16px;">
         <label class="theme-switch-wrapper" title="切換動態主題色" style="margin-right: 6px;">
           <input type="checkbox" id="theme-switch" class="skeuo-switch-input" checked>
           <div class="skeuo-switch-track">
@@ -71,6 +71,7 @@
       </div>
 
       <div class="track-info">
+        <span id="mobile-visualizer-warning" style="opacity: 0; transition: opacity 0.5s ease; position: absolute; bottom: 6px; left: 8px; font-size: 8px; color: rgba(var(--theme-color-rgb), 0.7); font-family: 'Inter', sans-serif; pointer-events: none; z-index: 10;">* 移動端無法顯示真實頻譜圖</span>
         <div class="lcd-eq" id="lcd-eq">
           <div class="lcd-bar"></div>
           <div class="lcd-bar"></div>

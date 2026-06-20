@@ -258,6 +258,11 @@ function playSong() {
       const lcdEq = document.getElementById("lcd-eq");
       if (lcdEq) lcdEq.classList.add("playing");
       
+      const warning = document.getElementById('mobile-visualizer-warning');
+      if (warning && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        warning.style.opacity = '1';
+      }
+      
       if ('mediaSession' in navigator) {
         navigator.mediaSession.playbackState = 'playing';
       }
@@ -274,6 +279,10 @@ function pauseSong() {
 
   const lcdEq = document.getElementById("lcd-eq");
   if (lcdEq) lcdEq.classList.remove("playing");
+  
+  const warning = document.getElementById('mobile-visualizer-warning');
+  if (warning) warning.style.opacity = '0';
+  
   cancelAnimationFrame(animationFrameId);
 
   clearTimeout(playTimeout);

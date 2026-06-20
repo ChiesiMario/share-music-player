@@ -456,7 +456,7 @@ html {
   position: relative;
   margin-top: 2px;
   margin-bottom: 5px;
-  transform: translateY(8px);
+  transform: translateY(1px);
 }
 
 .track-info h1 {
