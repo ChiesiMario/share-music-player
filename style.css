@@ -72,7 +72,7 @@ html {
 /* Artwork - Base Container */
 .artwork-container {
   width: min(75%, 38vh);
-  margin: 0 auto 10px auto;
+  margin: 0 auto 40px auto;
   aspect-ratio: 1 / 1;
   position: relative;
   display: flex;
@@ -1213,7 +1213,7 @@ html {
   /* 3. 最後才縮小封面與整體留白 */
   .artwork-container {
     width: min(55%, 35vh);
-    margin: 0 auto min(2vh, 15px) auto;
+    margin: 0 auto calc(min(2vh, 15px) + 30px) auto;
   }
 
   .player-card {
@@ -1306,5 +1306,5 @@ html {
   box-shadow: 0 0 6px #00ff44, inset 1px 1px 1px rgba(0,0,0,0.2);
 }
 .artwork-container.upload-mode {
-  margin-bottom: 36px !important;
+  margin-bottom: 66px !important;
 }
