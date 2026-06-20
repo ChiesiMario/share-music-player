@@ -325,8 +325,10 @@ function loadSong(song) {
     }
   }, 50);
 
+  const artistEle = document.getElementById("artist");
   if (artistLink) {
     artistLink.textContent = song.artist || "";
+    if (artistEle) artistEle.style.display = song.artist ? "block" : "none";
     if (song.displayName === '未找到歌曲') {
       artistLink.removeAttribute("href");
       artistLink.style.pointerEvents = "none";
@@ -336,8 +338,10 @@ function loadSong(song) {
     }
   }
 
+  const albumEle = document.getElementById("album");
   if (albumLink) {
     albumLink.textContent = song.album || "";
+    if (albumEle) albumEle.style.display = song.album ? "block" : "none";
     if (song.displayName === '未找到歌曲') {
       albumLink.removeAttribute("href");
       albumLink.style.pointerEvents = "none";
@@ -348,7 +352,10 @@ function loadSong(song) {
     }
   }
 
-  if (year) year.textContent = song.year || "";
+  if (year) {
+    year.textContent = song.year || "";
+    year.style.display = song.year ? "block" : "none";
+  }
 
   if ('mediaSession' in navigator) {
     // Determine the cover URL (ensure it's absolute if needed, or relative)
@@ -703,7 +710,7 @@ if (songs[0].mp3link) {
     let blob = null;
 
     try {
-      blob = await fetchWithResume(cacheBusterUrl, 3); // 3 retries
+      blob = await fetchWithResume(cacheBusterUrl, 5); // 5 retries
       
       // FIX: Since we already downloaded the full file into memory to parse ID3 tags,
       // we can convert it into a Blob URL. This prevents the <audio> element from 
@@ -712,8 +719,10 @@ if (songs[0].mp3link) {
       
     } catch (err) {
       console.error('All fetch retries failed:', err);
-      if (fetchProgressContainer) fetchProgressContainer.style.display = 'none';
-      processError(err);
+      showToast('下載失敗，即將返回首頁...');
+      setTimeout(() => {
+        window.location.href = window.location.origin + window.location.pathname;
+      }, 2000);
       return;
     }
 
@@ -897,6 +906,28 @@ document.addEventListener("touchend", stopDragging);
 music.addEventListener("timeupdate", updateProgressBar);
 music.addEventListener("ended", nextSong);
 
+// Cookie Helper Functions
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i=0;i < ca.length;i++) {
+    let c = ca[i];
+    while (c.charAt(0)==' ') c = c.substring(1,c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+
 // Tab Switching & Upload Logic
 const mainActionBtn = document.getElementById("main-action-btn");
 const localUploadInput = document.getElementById("local-upload-input");
@@ -932,23 +963,57 @@ if (mainActionBtn && localUploadInput) {
       modeLocal.classList.add("active");
       modeUrl.classList.remove("active");
       
-      // Reset to step 1
-      const stepPassword = document.getElementById('step-password');
-      const stepFile = document.getElementById('step-file');
-      if (stepPassword && stepFile) {
-        stepPassword.style.display = 'block';
-        stepFile.style.display = 'none';
-      }
-      
-      const uploadInfoText = document.getElementById('upload-info-text');
-      if (uploadInfoText) uploadInfoText.style.display = 'block';
-      const progressContainer = document.getElementById('lcd-upload-progress-container');
-      if (progressContainer) progressContainer.classList.remove('active');
+      const resetToPasswordStep = () => {
+        const stepPassword = document.getElementById('step-password');
+        const stepFile = document.getElementById('step-file');
+        if (stepPassword && stepFile) {
+          stepPassword.style.display = 'block';
+          stepFile.style.display = 'none';
+        }
+        
+        const uploadInfoText = document.getElementById('upload-info-text');
+        if (uploadInfoText) uploadInfoText.style.display = 'block';
+        const progressContainer = document.getElementById('lcd-upload-progress-container');
+        if (progressContainer) progressContainer.classList.remove('active');
 
-      if (mainActionBtn) {
-        mainActionBtn.disabled = true;
-        mainActionBtn.style.opacity = '0.5';
-        mainActionBtn.style.cursor = 'not-allowed';
+        if (mainActionBtn) {
+          mainActionBtn.disabled = true;
+          mainActionBtn.style.opacity = '0.5';
+          mainActionBtn.style.cursor = 'not-allowed';
+        }
+      };
+
+      const savedPass = getCookie('upload_password');
+      if (savedPass) {
+        fetch('/verify-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: savedPass })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('VERIFY_FAILED');
+          return res.json();
+        })
+        .then(() => {
+          const stepPassword = document.getElementById('step-password');
+          const stepFile = document.getElementById('step-file');
+          if (stepPassword && stepFile) {
+            stepPassword.style.display = 'none';
+            stepFile.style.display = 'block';
+          }
+          if (mainActionBtn) {
+            mainActionBtn.disabled = false;
+            mainActionBtn.style.opacity = '1';
+            mainActionBtn.style.cursor = 'pointer';
+          }
+          const passwordInput = document.getElementById('upload-password-input');
+          if (passwordInput) passwordInput.value = savedPass;
+        })
+        .catch(() => {
+          resetToPasswordStep();
+        });
+      } else {
+        resetToPasswordStep();
       }
     });
   }
@@ -980,6 +1045,8 @@ if (mainActionBtn && localUploadInput) {
       .then(() => {
         verifyPasswordBtn.innerHTML = '確認';
         verifyPasswordBtn.disabled = false;
+        
+        setCookie('upload_password', password, 30);
         
         const stepPassword = document.getElementById('step-password');
         const stepFile = document.getElementById('step-file');
