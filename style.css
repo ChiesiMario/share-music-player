@@ -918,7 +918,7 @@ html {
 .retro-loading-container.active {
   grid-template-rows: 1fr;
   opacity: 1;
-  margin-top: 15px;
+  margin-top: 5px;
   overflow: visible;
 }
 
@@ -929,7 +929,7 @@ html {
 }
 
 .retro-loading-container.active .retro-loading-content {
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 .retro-loading-header {

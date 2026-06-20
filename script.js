@@ -860,6 +860,11 @@ if (mainActionBtn && localUploadInput) {
       tabLocal.classList.remove("active");
       modeUrl.classList.add("active");
       modeLocal.classList.remove("active");
+      if (mainActionBtn) {
+        mainActionBtn.disabled = false;
+        mainActionBtn.style.opacity = '1';
+        mainActionBtn.style.cursor = 'pointer';
+      }
     });
 
     tabLocal.addEventListener("click", () => {
@@ -868,12 +873,74 @@ if (mainActionBtn && localUploadInput) {
       tabUrl.classList.remove("active");
       modeLocal.classList.add("active");
       modeUrl.classList.remove("active");
+      
+      // Reset to step 1
+      const stepPassword = document.getElementById('step-password');
+      const stepFile = document.getElementById('step-file');
+      if (stepPassword && stepFile) {
+        stepPassword.style.display = 'block';
+        stepFile.style.display = 'none';
+      }
+      
+      const uploadInfoText = document.getElementById('upload-info-text');
+      if (uploadInfoText) uploadInfoText.style.display = 'block';
+      const progressContainer = document.getElementById('lcd-upload-progress-container');
+      if (progressContainer) progressContainer.classList.remove('active');
+
+      if (mainActionBtn) {
+        mainActionBtn.disabled = true;
+        mainActionBtn.style.opacity = '0.5';
+        mainActionBtn.style.cursor = 'not-allowed';
+      }
     });
   }
 
   if (fakeFileInputWrapper) {
     fakeFileInputWrapper.addEventListener("click", () => {
       localUploadInput.click();
+    });
+  }
+
+  const verifyPasswordBtn = document.getElementById('verify-password-btn');
+  if (verifyPasswordBtn) {
+    verifyPasswordBtn.addEventListener('click', () => {
+      const passwordInput = document.getElementById('upload-password-input');
+      const password = passwordInput ? passwordInput.value : '';
+      
+      verifyPasswordBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      verifyPasswordBtn.disabled = true;
+
+      fetch('/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('VERIFY_FAILED');
+        return res.json();
+      })
+      .then(() => {
+        verifyPasswordBtn.innerHTML = '確認';
+        verifyPasswordBtn.disabled = false;
+        
+        const stepPassword = document.getElementById('step-password');
+        const stepFile = document.getElementById('step-file');
+        if (stepPassword && stepFile) {
+          stepPassword.style.display = 'none';
+          stepFile.style.display = 'block';
+        }
+
+        if (mainActionBtn) {
+          mainActionBtn.disabled = false;
+          mainActionBtn.style.opacity = '1';
+          mainActionBtn.style.cursor = 'pointer';
+        }
+      })
+      .catch(() => {
+        verifyPasswordBtn.innerHTML = '確認';
+        verifyPasswordBtn.disabled = false;
+        showToast('密碼錯誤！');
+      });
     });
   }
 
@@ -948,6 +1015,9 @@ if (mainActionBtn && localUploadInput) {
         if (progressContainer) {
           progressContainer.classList.add('active');
         }
+        const uploadInfoText = document.getElementById('upload-info-text');
+        if (uploadInfoText) uploadInfoText.style.display = 'none';
+
         if (progressBar) progressBar.style.width = '0%';
         if (progressText) progressText.textContent = '分析中...';
 

@@ -117,7 +117,7 @@
             <button id="tab-url" class="tab-btn active">網路網址</button>
             <button id="tab-local" class="tab-btn">本機上傳</button>
           </div>
-          <div class="modes-wrapper" style="display: grid;">
+          <div class="modes-wrapper" style="display: grid; min-height: 90px;">
             <div id="mode-url" class="input-mode active" style="grid-area: 1/1;">
               <div class="input-wrapper">
                 <i class="fa-solid fa-link input-icon"></i>
@@ -125,29 +125,36 @@
               </div>
             </div>
             <div id="mode-local" class="input-mode" style="grid-area: 1/1;">
-              <div class="input-wrapper" id="fake-file-input-wrapper" style="cursor: pointer;">
-                <i class="fa-solid fa-folder-open input-icon"></i>
-                <input type="text" id="fake-file-input" class="url-input" placeholder="點擊選擇音頻檔案以上傳..." readonly
-                  style="cursor: pointer;">
-              </div>
-              <div class="input-wrapper" style="margin-top: 8px;">
-                <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" id="upload-password-input" class="url-input" placeholder="請輸入伺服器密碼">
+              <!-- Step 1: Password Verification -->
+              <div id="step-password" style="width: 100%; animation: fadeIn 0.3s ease;">
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-lock input-icon"></i>
+                  <input type="password" id="upload-password-input" class="url-input" placeholder="請輸入伺服器密碼" style="padding-right: 70px;">
+                  <button id="verify-password-btn" class="verify-btn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: rgba(84, 200, 250, 0.1); color: #54c8fa; border: 1px solid #54c8fa; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: all 0.3s;">確認</button>
+                </div>
               </div>
 
-              <p
-                style="font-size: 10px; color: rgba(84, 200, 250, 0.7); text-align: left; margin-top: 8px; margin-bottom: 0; font-family: 'Inter', sans-serif;">
-                <i class="fa-solid fa-circle-info"></i> 上傳的文件會在 36 小時後刪除
-              </p>
+              <!-- Step 2: File Selection -->
+              <div id="step-file" style="width: 100%; display: none; animation: fadeIn 0.3s ease;">
+                <div class="input-wrapper" id="fake-file-input-wrapper" style="cursor: pointer;">
+                  <i class="fa-solid fa-folder-open input-icon"></i>
+                  <input type="text" id="fake-file-input" class="url-input" placeholder="點擊選擇音頻檔案以上傳..." readonly
+                    style="cursor: pointer;">
+                </div>
+                <p
+                  style="font-size: 10px; color: rgba(84, 200, 250, 0.7); text-align: left; margin-top: 8px; margin-bottom: 0; font-family: 'Inter', sans-serif;">
+                  <i class="fa-solid fa-circle-info"></i> 上傳的文件會在 36 小時後刪除
+                </p>
 
-              <div id="lcd-upload-progress-container" class="retro-loading-container">
-                <div class="retro-loading-content">
-                  <div class="retro-loading-header">
-                    <span class="retro-loading-text">Loading</span>
-                    <span id="lcd-upload-progress-text" class="retro-loading-pct">0%</span>
-                  </div>
-                  <div id="lcd-upload-progress-track" class="retro-loading-track">
-                    <div id="lcd-upload-progress-bar" class="retro-loading-bar"></div>
+                <div id="lcd-upload-progress-container" class="retro-loading-container">
+                  <div class="retro-loading-content">
+                    <div class="retro-loading-header">
+                      <span class="retro-loading-text">Loading</span>
+                      <span id="lcd-upload-progress-text" class="retro-loading-pct">0%</span>
+                    </div>
+                    <div id="lcd-upload-progress-track" class="retro-loading-track">
+                      <div id="lcd-upload-progress-bar" class="retro-loading-bar"></div>
+                    </div>
                   </div>
                 </div>
               </div>
