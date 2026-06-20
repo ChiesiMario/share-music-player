@@ -87,6 +87,14 @@ themeSwitch.addEventListener('change', (e) => {
 function setupAudioAnalyzer() {
   if (isAnalyzerSetup) return;
 
+  // On mobile devices, routing <audio> through AudioContext breaks background playback.
+  // We return early here so mobile devices will use the fake visualizer fallback,
+  // ensuring the music continues to play when the screen is locked or browser is in background.
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    isAnalyzerSetup = false;
+    return;
+  }
+
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -131,8 +139,27 @@ function updateVisualizer() {
     bars.forEach((bar, index) => {
       let val = 0;
       if (useFake) {
-        // Fake frequency bounce if CORS blocks Web Audio API
-        val = Math.random() * 200 + 20; // Random value between 20 and 220
+        // Smooth fake frequency bounce
+        if (!bar.dataset.currentVal) {
+          bar.dataset.currentVal = 20;
+          bar.dataset.targetVal = 20;
+          bar.dataset.lastUpdate = Date.now();
+        }
+        
+        const now = Date.now();
+        // Update target value every 100-200ms for realistic beat feel
+        if (now - bar.dataset.lastUpdate > 100 + Math.random() * 100) {
+          bar.dataset.targetVal = Math.random() * 200 + 20;
+          bar.dataset.lastUpdate = now;
+        }
+        
+        // Smoothly interpolate current value towards target value
+        let curr = parseFloat(bar.dataset.currentVal);
+        let target = parseFloat(bar.dataset.targetVal);
+        curr += (target - curr) * 0.2; // 0.2 is the smoothing factor
+        bar.dataset.currentVal = curr;
+        
+        val = curr;
       } else {
         // Logarithmic mapping: concentrate more bars on the low end (bass/kick)
         const minBin = 1;
@@ -230,6 +257,10 @@ function playSong() {
       }).catch(e => console.error("Playback failed:", e));
       const lcdEq = document.getElementById("lcd-eq");
       if (lcdEq) lcdEq.classList.add("playing");
+      
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing';
+      }
     }
   }, 1000);
 }
@@ -247,9 +278,22 @@ function pauseSong() {
 
   clearTimeout(playTimeout);
   music.pause();
+
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'paused';
+  }
 }
 
 playBtn.addEventListener("click", () => (isPlaying ? pauseSong() : playSong()));
+
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.setActionHandler('play', () => {
+    playSong();
+  });
+  navigator.mediaSession.setActionHandler('pause', () => {
+    pauseSong();
+  });
+}
 
 function loadSong(song) {
   title.classList.remove('loading-text');
@@ -300,6 +344,19 @@ function loadSong(song) {
   }
 
   if (year) year.textContent = song.year || "";
+
+  if ('mediaSession' in navigator) {
+    // Determine the cover URL (ensure it's absolute if needed, or relative)
+    const coverUrl = song.cover && song.cover !== './img/logo.png' ? song.cover : `${window.location.origin}/img/logo.png`;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.displayName === '未找到歌曲' ? 'Music Share' : song.displayName,
+      artist: song.artist || 'MUSIC SHARE',
+      album: song.album || '',
+      artwork: [
+        { src: coverUrl, sizes: '512x512', type: 'image/png' }
+      ]
+    });
+  }
 
   // Only set the src if it has changed to prevent interrupting playback
   if (music.getAttribute("src") !== song.mp3link) {
