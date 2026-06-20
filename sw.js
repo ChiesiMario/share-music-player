@@ -1,4 +1,4 @@
-const CACHE_NAME = 'music-share-v2';
+const CACHE_NAME = 'music-share-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -41,14 +41,17 @@ self.addEventListener('fetch', (event) => {
   // Do not intercept API calls like /metadata
   if (event.request.url.includes('/metadata')) return;
 
+  // Network First strategy
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+    fetch(event.request)
+      .then((networkResponse) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      })
+      .catch(() => {
+        return caches.match(event.request);
       })
   );
 });
