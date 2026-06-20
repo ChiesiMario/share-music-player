@@ -727,7 +727,7 @@ if (songs[0].mp3link) {
   loadAndParseMetadata();
 } else {
   if (songs[0].displayName === '') {
-    songs[0].displayName = '請輸入歌曲來源';
+    songs[0].displayName = '等待載入音源';
     songs[0].artist = '';
     loadSong(songs[0]);
     const inputContainer = document.getElementById("url-input-container");
@@ -982,10 +982,6 @@ if (mainActionBtn && localUploadInput) {
 
     mainActionBtn.classList.add("active-led", "pressed");
     mainActionBtn.disabled = true;
-    const span = mainActionBtn.querySelector('span');
-    if (span) {
-      span.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> 讀取中...';
-    }
     setTimeout(() => {
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.set('link', urlInput);
@@ -1355,7 +1351,7 @@ function playTouchSound() {
 // Attach physical sound to all buttons
 document.addEventListener('mousedown', (e) => {
   // LCD Touch Screen elements
-  const touchElem = e.target.closest('.tab-btn, #fake-file-input-wrapper, #fake-file-input');
+  const touchElem = e.target.closest('.tab-btn, #fake-file-input-wrapper, #fake-file-input, .verify-btn');
   if (touchElem) {
     playTouchSound();
     return; // Prevent physical sound
