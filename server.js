@@ -5,10 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const mm = require('music-metadata');
+require('dotenv').config();
 
 const app = express();
 const port = 8000;
-const UPLOAD_PASSWORD = 'admin'; // 預設上傳密碼
+const UPLOAD_PASSWORD = process.env.UPLOAD_PASSWORD || 'admin'; // 預設上傳密碼
 
 // Initialize cache directory
 const CACHE_DIR = path.join(__dirname, '.cache');
@@ -67,6 +68,11 @@ app.post('/check-file', (req, res) => {
 
   if (!md5 || !ext) {
     return res.status(400).json({ error: 'Missing md5 or ext' });
+  }
+
+  // Prevent Path Traversal: ensure md5 and ext only contain alphanumeric chars, dots, and hyphens
+  if (!/^[a-f0-9]+$/i.test(md5) || !/^\.[a-z0-9]+$/i.test(ext)) {
+    return res.status(400).json({ error: 'Invalid md5 or ext format' });
   }
 
   const newFilename = md5 + ext;
@@ -172,6 +178,18 @@ app.get('/metadata', async (req, res) => {
     console.log(`Cache miss: fetching from remote for ${fileUrl}`);
     let metadata;
     if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      try {
+        const parsedUrl = new URL(fileUrl);
+        const hostname = parsedUrl.hostname;
+        // SSRF Protection: Block localhost, loopback, and private IPv4 address spaces
+        const forbiddenPattern = /^(localhost|127\.|169\.254\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)/;
+        if (forbiddenPattern.test(hostname)) {
+          return res.status(403).json({ error: 'SSRF protection: Cannot fetch from internal or reserved IPs' });
+        }
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+      }
+
       const https = fileUrl.startsWith('https') ? require('https') : require('http');
       metadata = await new Promise((resolve, reject) => {
         https.get(fileUrl, async (response) => {
@@ -187,7 +205,14 @@ app.get('/metadata', async (req, res) => {
       });
     } else {
       const urlObj = new URL(fileUrl, `http://localhost:${port}`);
-      const filePath = path.join(__dirname, decodeURIComponent(urlObj.pathname));
+      
+      // Prevent Path Traversal: ensure the resolved path strictly stays within the uploads directory
+      const normalizedPath = path.normalize(decodeURIComponent(urlObj.pathname));
+      const filePath = path.join(__dirname, normalizedPath);
+      
+      if (!filePath.startsWith(__dirname)) {
+        return res.status(403).json({ error: 'Forbidden path' });
+      }
 
       if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
         return res.status(404).json({ error: 'File not found or is a directory' });
@@ -216,26 +241,41 @@ app.get('/metadata', async (req, res) => {
   }
 });
 // --- File Cleanup Mechanism ---
-// Check and delete files older than 36 hours
-const MAX_AGE_MS = 36 * 60 * 60 * 1000;
+// Check and delete files older than 36 hours for uploads, and 180 days for cache
+const MAX_AGE_MS_UPLOADS = 36 * 60 * 60 * 1000;
+const MAX_AGE_MS_CACHE = 180 * 24 * 60 * 60 * 1000;
 
 function cleanupOldFiles() {
+  const now = Date.now();
+
+  // Cleanup uploads
   fs.readdir(uploadDir, (err, files) => {
-    if (err) {
-      console.error('Error reading uploads directory for cleanup:', err);
-      return;
-    }
-    
-    const now = Date.now();
+    if (err) return console.error('Error reading uploads directory for cleanup:', err);
     files.forEach(file => {
       const filePath = path.join(uploadDir, file);
       fs.stat(filePath, (err, stats) => {
         if (err) return;
-        
-        if (now - stats.mtimeMs > MAX_AGE_MS) {
+        if (now - stats.mtimeMs > MAX_AGE_MS_UPLOADS) {
           fs.unlink(filePath, err => {
-            if (err) console.error(`Failed to delete old file ${file}:`, err);
-            else console.log(`Deleted old file: ${file}`);
+            if (err) console.error(`Failed to delete old upload file ${file}:`, err);
+            else console.log(`Deleted old upload file: ${file}`);
+          });
+        }
+      });
+    });
+  });
+
+  // Cleanup cache
+  fs.readdir(CACHE_DIR, (err, files) => {
+    if (err) return console.error('Error reading cache directory for cleanup:', err);
+    files.forEach(file => {
+      const filePath = path.join(CACHE_DIR, file);
+      fs.stat(filePath, (err, stats) => {
+        if (err) return;
+        if (now - stats.mtimeMs > MAX_AGE_MS_CACHE) {
+          fs.unlink(filePath, err => {
+            if (err) console.error(`Failed to delete old cache file ${file}:`, err);
+            else console.log(`Deleted old cache file: ${file}`);
           });
         }
       });
